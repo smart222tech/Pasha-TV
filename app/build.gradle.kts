@@ -107,4 +107,6 @@ dependencies {
     implementation("androidx.work:work-runtime-ktx:2.10.0")
 
     testImplementation("junit:junit:4.13.2")
+    // Real JSON implementation for local JVM tests; android.jar provides stub methods that throw at runtime.
+    testImplementation("org.json:json:20240303")
 }
