@@ -241,7 +241,6 @@ fun Sidebar(tab: Int, onTab: (Int) -> Unit, modifier: Modifier, activeFocus: Foc
             visible.forEach { id ->
                 SideItem(id, MENU_LABELS[id], id == tab, true, if (id == tab) Modifier.focusRequester(activeFocus) else Modifier, horizontal = true) { onPick(id) }
             }
-            PhoneSearchItem(true, Modifier, horizontal = true)
         }
         return
     }
@@ -274,9 +273,7 @@ fun Sidebar(tab: Int, onTab: (Int) -> Unit, modifier: Modifier, activeFocus: Foc
                     SideItem(id, MENU_LABELS[id], id == tab, expanded, if (id == tab) Modifier.focusRequester(activeFocus) else Modifier) { onPick(id) }
                 }
             }
-            // At the very bottom: phone search (QR code), so you can type on the phone instead of with the remote
             Spacer(Modifier.weight(1f))
-            PhoneSearchItem(expanded, Modifier.padding(bottom = dpx(22)))
         }
     }
 }
