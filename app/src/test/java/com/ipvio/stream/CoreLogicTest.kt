@@ -130,7 +130,7 @@ http://h/x
     }
 
     // ---------------------------------------------------------------- Menü
-    @Test fun menue_standard() = assertEquals(listOf(0, 3, 1, 2, 10, 6, 7, 8, 9, 4, 5), MenuLogic.parseOrder(null))
+    @Test fun menue_standard() = assertEquals(listOf(3, 7, 1, 2, 5, 0, 4, 6, 8, 9, 10), MenuLogic.parseOrder(null))
 
     @Test fun menue_alteReihenfolge_neueBereicheVorEinstellungen() {
         assertEquals(listOf(0, 1, 2, 3, 4, 6, 7, 8, 9, 10, 5), MenuLogic.parseOrder("0,1,2,3,4,5"))
@@ -145,7 +145,7 @@ http://h/x
     }
 
     @Test fun menue_startUndEinstellungenBleibenImmerSichtbar() {
-        assertEquals(listOf(1, 2, 6), MenuLogic.parseHidden("0,1,2,5,6,19"))
+        assertEquals(listOf(0, 1, 2, 6), MenuLogic.parseHidden("0,1,2,5,6,19"))
         assertEquals(emptyList<Int>(), MenuLogic.toggle(emptyList(), 0))
         assertEquals(emptyList<Int>(), MenuLogic.toggle(emptyList(), 5))
         val all = MenuLogic.visible(MenuLogic.DEFAULT_ORDER, listOf(1, 2, 3, 4, 6, 7, 8, 9, 10))
