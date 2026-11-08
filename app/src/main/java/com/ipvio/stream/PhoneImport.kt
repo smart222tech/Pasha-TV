@@ -37,7 +37,7 @@ object PhoneImportLogic {
 
     fun newCode(rnd: java.util.Random): String = (1000 + rnd.nextInt(9000)).toString()
 
-    /** Language of the phone page from "Accept-Language": the first of the app languages (de, en, tr, bs, hr, sr, es, fr, it), otherwise English. */
+    /** Language of the phone page from "Accept-Language": the first of the app languages (de, en, tr, bs, hr, sr, es, fr, it), including Dutch (nl), otherwise English. */
     fun langIndex(accept: String): Int {
         for (part in accept.split(',')) {
             val i = I18nCore.CODES.indexOf(part.substringBefore(';').trim().substringBefore('-').lowercase())
