@@ -34,7 +34,7 @@ class Round17Test {
         assertEquals(11, MenuLogic.COUNT)
         assertTrue(MenuLogic.VERLAUF in MenuLogic.parseOrder(null))
         assertEquals(MenuLogic.COUNT, MenuLogic.parseOrder("0,1,2,3,4,5").size)
-        assertFalse(MenuLogic.VERLAUF in MenuLogic.parseHidden(MenuLogic.DEFAULT_HIDDEN))
+        assertTrue(MenuLogic.VERLAUF in MenuLogic.parseHidden(MenuLogic.DEFAULT_HIDDEN))\n        assertEquals(listOf(3, 7, 1, 2, 5), MenuLogic.visible(MenuLogic.DEFAULT_ORDER, MenuLogic.parseHidden(MenuLogic.DEFAULT_HIDDEN)))
     }
 
     // T237
