@@ -124,10 +124,15 @@ object AppSettings {
         clockSize = p.getInt("clock_size", 1).coerceIn(0, 2)
         menuOrder.clear(); menuOrder.addAll(MenuLogic.parseOrder(p.getString("menu_order", null)))
         menuHidden.clear(); menuHidden.addAll(MenuLogic.parseHidden(p.getString("menu_hidden", MenuLogic.DEFAULT_HIDDEN)))
-        // One-time (round 14): remove "EPG" from the sidebar (it only opened the TV guide, which exists in Live TV)
-        if (p.getInt("menu_ver", 1) < 2) {
-            if (MenuLogic.EPG !in menuHidden) menuHidden.add(MenuLogic.EPG)
-            p.edit().putInt("menu_ver", 2).putString("menu_hidden", menuHidden.joinToString(",")).apply()
+        // One-time (PASHA TV menu): enforce the requested five entries and their exact order.
+        // Existing installations receive the same clean menu as fresh installations.
+        if (p.getInt("menu_ver", 1) < 3) {
+            menuOrder.clear(); menuOrder.addAll(MenuLogic.DEFAULT_ORDER)
+            menuHidden.clear(); menuHidden.addAll(MenuLogic.parseHidden(MenuLogic.DEFAULT_HIDDEN))
+            p.edit().putInt("menu_ver", 3)
+                .putString("menu_order", menuOrder.joinToString(","))
+                .putString("menu_hidden", menuHidden.joinToString(","))
+                .apply()
         }
         searchHistory.clear()
         searchHistory.addAll((p.getString("search_hist", "") ?: "").split("\n").filter { it.isNotBlank() })
