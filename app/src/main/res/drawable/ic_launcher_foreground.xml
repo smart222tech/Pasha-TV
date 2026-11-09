@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- IPVIO-Logo (Bild ic_logo_fg.png) für das adaptive App-Symbol -->
-<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
-    android:src="@drawable/ic_logo_fg"
-    android:gravity="fill" />
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- PASHA TV Lite: forward-motion mark (the selected fourth concept). -->
+    <path
+        android:fillColor="#22D3EE"
+        android:pathData="M15,29 L48,54 L15,79 L15,64 L35,54 L15,44 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M39,29 L72,54 L39,79 L39,64 L59,54 L39,44 Z" />
+    <path
+        android:fillColor="#22D3EE"
+        android:pathData="M63,29 L96,54 L63,79 L63,64 L83,54 L63,44 Z" />
+</vector>
