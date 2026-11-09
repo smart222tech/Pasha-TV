@@ -62,9 +62,9 @@ private val CATS = listOf(
     Cat(AIcon.Download, "Listen importieren", "Letterboxd, MyAnimeList, Trakt"),
     Cat(AIcon.Live, "Boomer Mode", "Ganz einfach: große Kacheln zum Auswählen"),
     Cat(AIcon.Sliders, "Startseite anpassen", "Reihen und Widgets wählen und ordnen"),
-    Cat(AIcon.Info, "Über IPVIO Stream", "Version, Quellen, Zurücksetzen"),
+    Cat(AIcon.Info, "Über PASHA TV Lite", "App-Informationen und Lizenz"),
     // Donate is always the very last entry
-    Cat(AIcon.HeartFilled, "Spende", "Unterstütze IPVIO Stream")
+    Cat(AIcon.HeartFilled, "Spende", "Unterstütze das Projekt")
 )
 
 /** Open a settings page directly (e.g. profile circle at the top with only one profile: page "Profiles"). */
@@ -99,7 +99,7 @@ fun SettingsHub(onAdd: () -> Unit, reload: () -> Unit) {
                 Text("Einstellungen", color = Color.White, fontSize = spx(38), fontWeight = FontWeight.ExtraBold)
                 Text("Alles rund um Aussehen, Wiedergabe und Konto", color = Tok.TextLow, fontSize = spx(16))
             }
-            val visibleCats = CATS.withIndex().filter { it.index != 9 && it.index != 15 }
+            val visibleCats = CATS.withIndex().filter { it.index in setOf(0, 1, 2, 3, 5, 6, 8, 18) }
             visibleCats.chunked(3).forEach { row ->
                 Row(horizontalArrangement = Arrangement.spacedBy(dpx(16))) {
                     row.forEach { entry ->
@@ -448,44 +448,38 @@ private fun ParentalPage(ctx: Context, onExit: () -> Unit) {
 
 @Composable
 private fun GeneralPage(ctx: Context) {
-    var tick by remember { mutableIntStateOf(0) }
     SectionTitle("Start")
+    Text(
+        "PASHA TV Lite startet automatisch mit dem zuletzt angesehenen Sender. Beim ersten Start wird der erste verfügbare Sender geöffnet.",
+        color = Tok.TextLow, fontSize = spx(16), modifier = Modifier.widthIn(max = 760.dp)
+    )
+    SectionTitle("Gerätestart")
     ToggleRow(
         "Beim Einschalten des Geräts öffnen",
-        "IPVIO Stream startet automatisch, sobald der Fernseher oder die Box hochgefahren ist.",
+        "Versucht PASHA TV Lite beim Start des Fernsehers oder der Box automatisch zu öffnen. Die Verfügbarkeit hängt von Android bzw. Fire OS ab.",
         General.autoStart
     ) { on ->
         General.setAutoStart(ctx, on)
         if (on && !canStartFromBoot(ctx)) openOverlaySettings(ctx)
     }
-    val granted = remember(tick, General.autoStart) { canStartFromBoot(ctx) }
-    if (General.autoStart) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            IconLabel(
-                if (granted) AIcon.Check else AIcon.Warning,
-                if (granted) "Berechtigung erteilt" else "Berechtigung „Über anderen Apps einblenden“ fehlt",
-                if (granted) Accent2 else Color(0xFFFFB454), 15.sp, iconSize = 16.dp, maxLines = 2
-            )
-            if (!granted) SmallPill("Einstellung öffnen") { openOverlaySettings(ctx) }
-            SmallPill("Prüfen") { tick++; reportOverlayState(ctx) }
-        }
-        Hint("Ab Android 10 erlaubt das System den Autostart nur mit dieser Berechtigung. Manche Geräte (z. B. einzelne Fire-TV-Modelle) blockieren den Autostart trotzdem; das kann die App nicht ändern.")
+    if (General.autoStart && !canStartFromBoot(ctx)) {
+        Hint("Für den Autostart fehlt möglicherweise die Berechtigung „Über anderen Apps einblenden“. Fire OS kann diese Funktion einschränken.")
+        SmallPill("Berechtigung prüfen") { reportOverlayState(ctx) }
     }
-    val tabs = listOf("Start", "Filme", "Serien", "Live TV", "Suche")
-    val shown = SettingsLogic.resolveStartTab(General.startTab, AppSettings.menuOrder.toList(), AppSettings.menuHidden.toList())
-    SelectRow("Startseite", tabs[shown], tabs, shown) { General.setStartTab(ctx, it) }
-    Hint("Diese Seite öffnet sich beim Start der App. Versteckte Menüpunkte sind nicht wählbar.")
-    ToggleRow("Letzten Sender beim Start abspielen", "Wenn du zuletzt Live TV gesehen hast, läuft dieser Sender direkt nach dem Start.", General.resumeLive) { General.setResumeLive(ctx, it) }
-    ToggleRow("Letzten Film / letzte Serie beim Start fortsetzen", "Wenn du zuletzt einen Film oder eine Serie gesehen hast, läuft sie nach dem Start an der gemerkten Stelle weiter (bei einer fertigen Folge mit der nächsten).", General.resumeVod) { General.setResumeVod(ctx, it) }
-
     SectionTitle("Bedienung")
-    ToggleRow("Beenden bestätigen", "Auf der Startseite muss „Zurück“ zweimal gedrückt werden, damit die App nicht aus Versehen schließt.", General.confirmExit) { General.setConfirmExit(ctx, it) }
-    // Phone/tablet: landscape (the UI is built for the TV)
+    ToggleRow(
+        "Beenden bestätigen",
+        "Auf der TV-Startseite muss Zurück zweimal gedrückt werden, damit die App nicht versehentlich geschlossen wird.",
+        General.confirmExit
+    ) { General.setConfirmExit(ctx, it) }
     if (MobilePrefs.isMobile(ctx)) {
-        val act = generateSequence<Context>(ctx) { (it as? android.content.ContextWrapper)?.baseContext }.filterIsInstance<android.app.Activity>().firstOrNull()
-        ToggleRow("Auf dem Handy im Querformat", "Die App ist für den Fernseher gebaut und wirkt quer am besten. Aus: dreht mit dem Gerät. Im Player: Tippen zeigt die Steuerung, Doppeltippen links/rechts spult, in der Mitte Pause.", MobilePrefs.landscape) {
-            if (act != null) MobilePrefs.set(act, it)
-        }
+        val act = generateSequence<Context>(ctx) { (it as? android.content.ContextWrapper)?.baseContext }
+            .filterIsInstance<android.app.Activity>().firstOrNull()
+        ToggleRow(
+            "Auf dem Handy im Querformat",
+            "Die Oberfläche ist für TV-Bildschirme optimiert. Im Player bleiben die Touch-Steuerungen verfügbar.",
+            MobilePrefs.landscape
+        ) { if (act != null) MobilePrefs.set(act, it) }
     }
 }
 
@@ -513,7 +507,7 @@ internal fun openOverlaySettings(ctx: Context) {
 /** Shows the result of the permission check so the "Prüfen" button gives visible feedback. */
 internal fun reportOverlayState(ctx: Context) {
     val msg = if (canStartFromBoot(ctx)) "Berechtigung erteilt. Der Autostart ist bereit."
-    else "Berechtigung fehlt noch. Bitte „Einstellung öffnen“ wählen und IPVIO Stream erlauben."
+    else "Berechtigung fehlt noch. Bitte „Einstellung öffnen“ wählen und PASHA TV Lite erlauben."
     android.widget.Toast.makeText(ctx, Lang.tr(msg), android.widget.Toast.LENGTH_LONG).show()
 }
 
@@ -1296,10 +1290,10 @@ private fun ApiKeysPage(ctx: Context) {
 
 @Composable
 private fun AboutPage(ctx: Context) {
-    Text("IPVIO Stream · Version " + appVersion(ctx), color = Color.White, fontSize = 18.sp)
-    Hint("IPVIO Stream ist ein Player und liefert selbst keine Inhalte. Nutze nur Quellen, für die du eine Berechtigung hast.")
+    Text("PASHA TV Lite · Version " + appVersion(ctx), color = Color.White, fontSize = 18.sp)
+    Hint("PASHA TV Lite ist ein Player. Die Verfügbarkeit einzelner Sender hängt von den jeweiligen Stream-Quellen ab. Nutze nur Quellen, für die du eine Berechtigung hast.")
     Hint("Dieses Produkt verwendet die TMDB-API, wird aber nicht von TMDB unterstützt oder zertifiziert. Wertungen: OMDb. Intro-Zeiten: TheIntroDB.")
-    Hint("IPVIO Stream ist freie Software unter der GNU General Public License v3 (GPL-3.0). Verwendete Bibliotheken: AndroidX/Jetpack Compose, Media3 (Apache 2.0), OkHttp, Coil (Apache 2.0), Jellyfin FFmpeg-Decoder (GPL-3.0), Schriften Outfit und Inter (SIL Open Font License).")
+    Hint("PASHA TV Lite ist freie Software unter der GNU General Public License v3 (GPL-3.0). Verwendete Bibliotheken: AndroidX/Jetpack Compose, Media3 (Apache 2.0), OkHttp, Coil (Apache 2.0), Jellyfin FFmpeg-Decoder (GPL-3.0), Schriften Outfit und Inter (SIL Open Font License).")
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         PillButton("Systemeinstellungen der App") {
             runCatching {
