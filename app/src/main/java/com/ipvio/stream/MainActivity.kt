@@ -1,500 +1,623 @@
 package com.ipvio.stream
 
 import android.os.Bundle
+import android.app.Activity
+import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.LocalOverscrollFactory
-import androidx.compose.foundation.background
-import kotlinx.coroutines.Dispatchers
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
-import androidx.compose.foundation.gestures.BringIntoViewSpec
-import androidx.compose.foundation.gestures.LocalBringIntoViewSpec
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.layout.layout
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.Density
-import coil.Coil
-import coil.ImageLoader
-import coil.memory.MemoryCache
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
+import com.ipvio.stream.data.Channel
+import com.ipvio.stream.data.RemoteChannelCatalog
+import kotlinx.coroutines.launch
 
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        // Load settings early so colors and size are right in the very first frame.
-        Profiles.init(this)
-        val pick = Profiles.needsPicker(this)
-        if (!pick) AppSettings.init(this)
-        General.init(this)
-        Boomer.init(this)
-        HomeLayout.init(this); BoomerLayout.init(this)
-        SidebarPrefs.init(this)
-        Config.init(this)
-        LiveSettings.init(this)
-        Recorder.attach(this)
-        MobilePrefs.apply(this)
-        // Fresh start (not just a rotated/recreated screen): "Resume last watched at start" may apply again.
-        // The process often lives on after quitting; the marker flag therefore stayed set from the first start and nothing was opened any more.
-        if (savedInstanceState == null) General.startupHandled = false
-        // WorkManager sets up its database on first use: off the main thread, so the first screen is not delayed
-        val app = applicationContext
-        Thread({ runCatching { Updater.apply(app) } }, "updater-apply").start()
-        CrashLog.install(this)
-        Coil.setImageLoader(
-            ImageLoader.Builder(this)
-                .memoryCache { MemoryCache.Builder(this).maxSizePercent(Mem.imageCachePercent(Mem.tier(this))).build() }
-                .allowRgb565(true)
-                .crossfade(false)
-                .build()
-        )
-        ScreenAwake.attach(this)
-        intent?.getStringExtra(Reminders.EXTRA_CH)?.let { AppNav.openChannel = it }
-        setContent { App(pick) }
-    }
+private val builtInChannels = listOf(
+    Channel("first", "Первый канал", "https://streaming.thestream.cyou/live/210-req_offset_28000000-req_window_0-1k_v5.m3u8", "Россия"),
+    Channel("russia1", "Россия 1", "http://45.159.74.13:80/Rossia1/tracks-v1a1/mono.m3u8", "Россия"),
+    Channel("rtr-planet", "РТР Планета", "http://ott-cdn.ucom.am/s15/index.m3u8", "Россия"),
+    Channel("russia-rtr", "Россия РТР", "https://sc.id-tv.kz:443/RossiyaRTR_34_35.m3u8", "Россия"),
+    Channel("tvc", "ТВЦ — ТВ Центр", "https://tvc-hls.cdnvideo.ru/tvc-res/smil:vd9221_2.smil/12ed865707c77a12eeecfa3177775684--tvc-res--vd9221_480p_2--tracks-v1a1--mono.m3u8?hls_proxy_host=22b5db40ced763465289cd8236e019fb", "Россия"),
+    Channel("domashniy", "Домашний", "http://45.159.74.13:80/Domashniy/tracks-v1a1/mono.m3u8", "Россия"),
+    Channel("channel9-israel", "Девятый канал HD (Израиль)", "https://contact.gostreaming.tv/Con-11/tracks-v1a1/mono.ts.m3u8", "Израиль"),
+    Channel("auto-plus", "Авто Плюс", "https://stream8.cinerama.uz/1036/tracks-v1a1/mono.m3u8", "Автомобильные"),
+    Channel("friday", "Пятница!", "https://vod.tuva.ru/friday/tracks-v1a1/mono.ts.m3u8", "Россия")
+)
 
-    /** Reminder tapped while the app is already running: open the channel. */
-    override fun onNewIntent(intent: android.content.Intent) {
-        super.onNewIntent(intent)
-        intent.getStringExtra(Reminders.EXTRA_CH)?.let { AppNav.openChannel = it }
-    }
+private val languageNames = linkedMapOf(
+    "ru" to "Русский",
+    "de" to "Deutsch",
+    "en" to "English",
+    "uk" to "Українська",
+    "ro" to "Română",
+    "tr" to "Türkçe",
+    "pl" to "Polski",
+    "system" to "Язык системы"
+)
 
-    override fun onStart() {
-        super.onStart()
-        Reminders.foreground = true
-    }
+private val translations = mapOf(
+    "ru" to listOf("Каналы", "Настройки", "Язык приложения", "Обновить список", "Обновляем список…", "Список обновлён", "Каналов загружено", "Не удалось обновить список", "Используется встроенный список", "Избранное", "Все каналы", "Назад к каналам", "Предыдущий", "Следующий", "Последний канал будет открываться автоматически."),
+    "de" to listOf("Sender", "Einstellungen", "App-Sprache", "Liste aktualisieren", "Senderliste wird aktualisiert…", "Liste aktualisiert", "Geladene Sender", "Senderliste konnte nicht aktualisiert werden", "Integrierte Liste wird verwendet", "Favoriten", "Alle Sender", "Zurück zur Senderliste", "Vorheriger", "Nächster", "Der zuletzt gesehene Sender wird automatisch geöffnet."),
+    "en" to listOf("Channels", "Settings", "App language", "Refresh list", "Updating channel list…", "List updated", "Channels loaded", "Could not update channel list", "Using built-in list", "Favorites", "All channels", "Back to channels", "Previous", "Next", "The last watched channel opens automatically."),
+    "uk" to listOf("Канали", "Налаштування", "Мова застосунку", "Оновити список", "Оновлюємо список…", "Список оновлено", "Каналів завантажено", "Не вдалося оновити список", "Використовується вбудований список", "Обране", "Усі канали", "Назад до каналів", "Попередній", "Наступний", "Останній переглянутий канал відкриватиметься автоматично."),
+    "ro" to listOf("Canale", "Setări", "Limba aplicației", "Actualizează lista", "Se actualizează lista…", "Lista a fost actualizată", "Canale încărcate", "Lista nu a putut fi actualizată", "Se folosește lista integrată", "Favorite", "Toate canalele", "Înapoi la canale", "Anterior", "Următorul", "Ultimul canal vizionat se va deschide automat."),
+    "tr" to listOf("Kanallar", "Ayarlar", "Uygulama dili", "Listeyi yenile", "Kanal listesi güncelleniyor…", "Liste güncellendi", "Yüklenen kanallar", "Kanal listesi güncellenemedi", "Yerleşik liste kullanılıyor", "Favoriler", "Tüm kanallar", "Kanallara dön", "Önceki", "Sonraki", "Son izlenen kanal otomatik açılır."),
+    "pl" to listOf("Kanały", "Ustawienia", "Język aplikacji", "Odśwież listę", "Aktualizowanie listy…", "Lista zaktualizowana", "Wczytane kanały", "Nie udało się zaktualizować listy", "Używana jest lista wbudowana", "Ulubione", "Wszystkie kanały", "Wróć do kanałów", "Poprzedni", "Następny", "Ostatnio oglądany kanał otworzy się automatycznie.")
+)
 
-    override fun onStop() {
-        Reminders.foreground = false
-        super.onStop()
-    }
+private fun currentLanguage(choice: String): String =
+    if (choice == "system") android.content.res.Resources.getSystem().configuration.locales[0].language.let {
+        if (it in translations) it else "ru"
+    } else choice
 
-    /** Home key (or app switch) by the user – not on the screensaver and not on trailer/external player. */
-    override fun onUserLeaveHint() {
-        super.onUserLeaveHint()
-        AppNav.leftByUser = true
-    }
+private fun tr(language: String, index: Int): String =
+    translations[currentLanguage(language)]?.get(index) ?: translations.getValue("ru")[index]
 
-    /** Back in the app after the Home key: to the home screen (see AppContent). */
-    override fun onRestart() {
-        super.onRestart()
-        if (AppNav.leftByUser) { AppNav.leftByUser = false; AppNav.homeSignal++ }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        // After standby or app switch set the window flag again in case the system dropped it
-        ScreenAwake.apply()
-    }
-
-    override fun onDestroy() {
-        ScreenAwake.detach(this)
-        super.onDestroy()
-    }
-
-    override fun onTrimMemory(level: Int) {
-        super.onTrimMemory(level)
-        @Suppress("DEPRECATION")
-        val low = TRIM_MEMORY_RUNNING_LOW
-        if (level >= low) Mem.trim(this)
-    }
-
-    @Suppress("OVERRIDE_DEPRECATION")
-    override fun onLowMemory() {
-        super.onLowMemory()
-        Mem.trim(this)
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-val SmoothSpec = object : BringIntoViewSpec {
-    override val scrollAnimationSpec = tween<Float>(280, easing = FastOutSlowInEasing)
-    override fun calculateScrollDistance(offset: Float, size: Float, containerSize: Float): Float {
-        val peek = 90f
-        val leading = offset
-        val trailing = offset + size
-        return when {
-            leading >= 0f && trailing <= containerSize -> 0f
-            leading < 0f && trailing > containerSize -> 0f
-            leading < 0f -> leading - peek
-            else -> trailing - containerSize + peek
-        }
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun App(pick: Boolean = false) {
-    // Display size: the design is for 960 dp width. On devices with more dp (e.g. Fire TV) it is scaled up automatically.
-    val cfg = LocalConfiguration.current
-    val base = LocalDensity.current
-    val factor = ThemeMath.uiFactor(Look.uiScale, cfg.screenWidthDp, cfg.screenHeightDp)
-    val tf = General.textFactor()
-    val scaled = remember(base.density, base.fontScale, factor, tf) { Density(base.density * factor, base.fontScale * tf) }
-    CompositionLocalProvider(
-        LocalDensity provides scaled,
-        LocalBringIntoViewSpec provides SmoothSpec,
-        LocalOverscrollFactory provides null
-    ) {
-        val c = LocalContext.current
-        var picked by remember { mutableStateOf(!pick) }
-        if (!picked) ProfilePicker { id -> Profiles.select(c, id); AppSettings.init(c); Parental.init(c); LangFilter.init(c); Boomer.init(c); HomeLayout.init(c); BoomerLayout.init(c); picked = true }
-        else {
-            LaunchedEffect(Unit) { delay(10_000); runCatching { SportAlerts.run(c.applicationContext) } }   // after the start: the playlist and the home screen come first
-            Box(Modifier.fillMaxSize()) { AppContent(); SportAlertHost() }
-        }
-    }
-}
-
-/** "Adjust screen": margin all around (in percent of width/height) in case the TV cuts off edges. */
-fun Modifier.fitScreenInset(on: Boolean): Modifier = if (!on || (General.fitX == 0 && General.fitY == 0)) this else this.layout { m, c ->
-    val dx = (c.maxWidth * General.fitX / 100f).toInt()
-    val dy = (c.maxHeight * General.fitY / 100f).toInt()
-    val inner = c.copy(maxWidth = (c.maxWidth - 2 * dx).coerceAtLeast(0), maxHeight = (c.maxHeight - 2 * dy).coerceAtLeast(0), minWidth = 0, minHeight = 0)
-    val pl = m.measure(inner)
-    layout(c.maxWidth, c.maxHeight) { pl.place(dx, dy) }
-}
-
-private val SE_RE = Regex("""S(\d+)E(\d+)""")
+private val extraLabels = mapOf(
+    "ru" to listOf("Выберите язык", "Все каналы", "Избранное", "В избранном пока нет каналов", "Панель управления", "Автоскрытие панели", "1 секунда", "3 секунды", "5 секунд", "10 секунд", "Всегда показывать", "Цвет интерфейса", "Бирюзовый", "Синий", "Янтарный", "Видеоплеер", "ExoPlayer / Media3", "К списку", "Предыдущий", "Пауза", "Продолжить", "Следующий", "В избранное", "Убрать из избранного", "Настройки", "Выберите язык, затем откроется последний канал.", "Каналы", "Внешний вид"),
+    "de" to listOf("Sprache wählen", "Alle Sender", "Favoriten", "Noch keine Favoriten", "Steuerung", "Automatisches Ausblenden", "1 Sekunde", "3 Sekunden", "5 Sekunden", "10 Sekunden", "Immer anzeigen", "Oberflächenfarbe", "Türkis", "Blau", "Bernstein", "Videoplayer", "ExoPlayer / Media3", "Zur Senderliste", "Vorheriger", "Pause", "Weiter", "Nächster", "Zu Favoriten", "Aus Favoriten entfernen", "Einstellungen", "Sprache wählen, danach startet der letzte Sender.", "Sender", "Darstellung"),
+    "en" to listOf("Choose language", "All channels", "Favorites", "No favorite channels yet", "Controls", "Auto-hide controls", "1 second", "3 seconds", "5 seconds", "10 seconds", "Always visible", "Interface color", "Teal", "Blue", "Amber", "Video player", "ExoPlayer / Media3", "Channel list", "Previous", "Pause", "Resume", "Next", "Add to favorites", "Remove from favorites", "Settings", "Choose a language, then the last channel will start.", "Channels", "Appearance"),
+    "uk" to listOf("Оберіть мову", "Усі канали", "Обране", "В обраному ще немає каналів", "Керування", "Автоприховування панелі", "1 секунда", "3 секунди", "5 секунд", "10 секунд", "Завжди показувати", "Колір інтерфейсу", "Бірюзовий", "Синій", "Бурштиновий", "Відеоплеєр", "ExoPlayer / Media3", "До списку", "Попередній", "Пауза", "Продовжити", "Наступний", "До обраного", "Прибрати з обраного", "Налаштування", "Оберіть мову, після цього запуститься останній канал.", "Канали", "Вигляд"),
+    "ro" to listOf("Alege limba", "Toate canalele", "Favorite", "Nu există încă favorite", "Comenzi", "Ascundere automată", "1 secundă", "3 secunde", "5 secunde", "10 secunde", "Mereu vizibile", "Culoarea interfeței", "Turcoaz", "Albastru", "Chihlimbar", "Player video", "ExoPlayer / Media3", "La lista de canale", "Anterior", "Pauză", "Continuă", "Următorul", "Adaugă la favorite", "Elimină din favorite", "Setări", "Alege limba, apoi va porni ultimul canal.", "Canale", "Aspect"),
+    "tr" to listOf("Dil seçin", "Tüm kanallar", "Favoriler", "Henüz favori kanal yok", "Kontroller", "Otomatik gizleme", "1 saniye", "3 saniye", "5 saniye", "10 saniye", "Her zaman göster", "Arayüz rengi", "Turkuaz", "Mavi", "Kehribar", "Video oynatıcı", "ExoPlayer / Media3", "Kanal listesi", "Önceki", "Duraklat", "Devam et", "Sonraki", "Favorilere ekle", "Favorilerden kaldır", "Ayarlar", "Bir dil seçin, ardından son kanal açılır.", "Kanallar", "Görünüm")
+)
+private fun extra(language: String, index: Int): String =
+    extraLabels[currentLanguage(language)]?.get(index) ?: extraLabels.getValue("ru")[index]
 
 @Composable
-private fun AppContent() {
-    val ctx = LocalContext.current
-    remember {
-        AppSettings.init(ctx); WatchStore.init(ctx); History.init(ctx); Library.init(ctx); QualityStore.init(ctx)
-        PlaybackPrefs.init(ctx); DeadLinks.init(ctx); ChannelLists.init(ctx); Reminders.init(ctx); Reminders.schedule(ctx); 0
+private fun PashaLiteApp() {
+    val context = LocalContext.current
+    val prefs = remember { context.getSharedPreferences("pasha_lite", 0) }
+    val scope = rememberCoroutineScope()
+    var favorites by remember {
+        mutableStateOf(prefs.getStringSet("favorites", emptySet())?.toSet() ?: emptySet())
     }
-    // Interrupted in the middle of adding last time (crash, power loss): the add screen automatically continues loading
-    val resumeAdd = remember { PlaylistStore.pending(ctx)?.autoResume == true }
-    var adding by remember { mutableStateOf(PlaylistStore.savedUrl(ctx) == null || resumeAdd) }
-    // Top detail page (Item or PersonRef) plus back stack, so Back retraces Movie → Person → Movie
-    var top by remember { mutableStateOf<Any?>(null) }
-    val trail = remember { mutableStateListOf<Any>() }
-    val detail = top as? Item
-    val personTop = top as? PersonRef
-    fun pushTop(x: Any) { top?.let { trail.add(it) }; top = x }
-    fun popTop() { top = trail.removeLastOrNull() }
-    var browse by remember { mutableStateOf<BrowseState?>(null) }
-    var cats by remember { mutableStateOf<CatReq?>(null) }
-    var playing by remember { mutableStateOf<PlayReq?>(null) }
-    var tab by remember { mutableStateOf(SettingsLogic.resolveStartTab(General.startTab, AppSettings.menuOrder.toList(), AppSettings.menuHidden.toList())) }
-    val gridState = remember(browse) { LazyGridState() }
-    val states = listOf(
-        rememberLazyListState(), rememberLazyListState(), rememberLazyListState(),
-        rememberLazyListState(), rememberLazyListState(), rememberLazyListState(), rememberLazyListState(),
-        rememberLazyListState(), rememberLazyListState(), rememberLazyListState(), rememberLazyListState()
-    )
+    var language by remember { mutableStateOf(prefs.getString("language", "ru") ?: "ru") }
+    var languageChosen by remember { mutableStateOf(prefs.getBoolean("language_selected", false)) }
+    var showSettings by remember { mutableStateOf(false) }
+    var channelList by remember { mutableStateOf(builtInChannels) }
+    var selectedChannelId by remember {
+        mutableStateOf<String?>(prefs.getString("last_channel_id", null) ?: builtInChannels.first().id)
+    }
+    var isRefreshing by remember { mutableStateOf(false) }
+    var catalogStatus by remember { mutableStateOf("Встроенный список каналов") }
+    var catalogUpdatedAt by remember { mutableStateOf<String?>(null) }
+    var refreshError by remember { mutableStateOf<String?>(null) }
+    var favoritesTab by remember { mutableStateOf(false) }
+    var controlsTimeout by remember { mutableIntStateOf(prefs.getInt("controls_timeout", 5)) }
+    var themeChoice by remember { mutableIntStateOf(prefs.getInt("theme_choice", 0)) }
+    val settingsFocusRequester = remember { FocusRequester() }
 
-    // New app version on GitHub? Check silently once a day; a find appears in the bell at the top right.
-    LaunchedEffect(Unit) {
-        delay(8_000)   // erst nach dem Start, die Playlist hat Vorrang
-        runCatching { AppUpdate.autoCheck(ctx) }
+    val colors = when (themeChoice) {
+        1 -> darkColorScheme(primary = Color(0xFF82B1FF), secondary = Color(0xFFB3C7FF), background = Color(0xFF10151D), surface = Color(0xFF1B2634), surfaceVariant = Color(0xFF2A394A))
+        2 -> darkColorScheme(primary = Color(0xFFFFC46B), secondary = Color(0xFFFFD9A3), background = Color(0xFF19130F), surface = Color(0xFF2A211A), surfaceVariant = Color(0xFF3A2E23))
+        else -> darkColorScheme(primary = Color(0xFF70D6C5), secondary = Color(0xFF9AB7FF), background = Color(0xFF101419), surface = Color(0xFF192128), surfaceVariant = Color(0xFF26323B))
     }
 
-    LaunchedEffect(Unit) {
-        withContext(Dispatchers.IO) { General.cleanupLegacy(ctx) }
-        if (resumeAdd) return@LaunchedEffect
-        PlaylistStore.savedUrl(ctx)?.let { u ->
-            val skip = !SettingsLogic.refreshDue(General.plan(), General.lastRefresh, System.currentTimeMillis(), General.zone())
-            val ok = PlaylistStore.load(ctx, u, false, skip)
-            if (ok && !skip) General.markRefreshed(ctx)
-        }
+    fun persistFavorites(updated: Set<String>) {
+        favorites = updated
+        prefs.edit().putStringSet("favorites", updated.toSet()).apply()
     }
-
-    // Back in the app after the Home key: to the home screen (a running playback and adding stay as they are)
-    LaunchedEffect(AppNav.homeSignal) {
-        if (AppNav.homeSignal > 0 && playing == null && !adding) {
-            val changed = top != null || browse != null || cats != null || tab != 0
-            top = null; trail.clear(); browse = null; cats = null
-            if (changed) AppNav.focusTab = 0
-            if (tab != 0) { tab = 0; CatMemory.reset() }
-        }
+    fun selectChannel(id: String) {
+        selectedChannelId = id
+        prefs.edit().putString("last_channel_id", id).apply()
     }
-
-    // Left the add screen without anything loaded (e.g. resuming cancelled): load the saved playlist
-    var wasAdding by remember { mutableStateOf(adding) }
-    LaunchedEffect(adding) {
-        if (wasAdding && !adding && PlaylistStore.channels.isEmpty() && !PlaylistStore.loading) {
-            PlaylistStore.savedUrl(ctx)?.let { PlaylistStore.load(ctx, it, false, true) }
-        }
-        wasAdding = adding
+    fun changeChannel(step: Int) {
+        if (channelList.isEmpty()) return
+        val index = channelList.indexOfFirst { it.id == selectedChannelId }.let { if (it < 0) 0 else it }
+        val next = (index + step + channelList.size) % channelList.size
+        selectChannel(channelList[next].id)
     }
-
-    val all = PlaylistStore.channels
-    val liveAll = remember(all) { all.filter { it.kind == Kind.LIVE } }
-    // Do not fall into the screensaver while downloading and parsing the playlist
-    KeepScreenOn("playlist", PlaylistStore.loading)
-    // Genre detection in the background; restarts cleanly with every new list (reload, language filter, parental control)
-    LaunchedEffect(all) { kotlinx.coroutines.delay(8_000); Classifier.restart(ctx, all) }   // after the first screen is up, and debounced while the list is still changing
-
-    fun start(item: Item, title: String, url: String, startMs: Long = 0L) {
-        History.add(ctx, item.id)
-        val sm = SE_RE.find(title)
-        val season = sm?.groupValues?.get(1)?.toIntOrNull() ?: 0
-        val ep = sm?.groupValues?.get(2)?.toIntOrNull() ?: 0
-        val tmdb = MetaRepo.cached(item)?.tmdbId?.takeIf { it > 0 } ?: 0
-        var playUrl = url
-        var alts = emptyList<Variant>()
-        var note: String? = null
-        if (item.kind == Kind.MOVIE && !item.id.startsWith("rec:")) {
-            // Same movie in other qualities (own entries of the provider): choose to suit the device, the rest as fallbacks
-            val list = Sources.alternatives(item, all)
-            if (list.size > 1) {
-                alts = Sources.asVariants(list)
-                val chosen = alts.indexOfFirst { it.url == url }.coerceAtLeast(0)
-                val cap = PlaybackPrefs.cap(ctx)
-                val best = QualityLogic.order(alts.map { it.quality }, cap).first()
-                val rc = QualityLogic.rank(alts[chosen].quality)
-                // Quality chosen explicitly on the detail page takes precedence over the automatic mode
-                val vp = VariantPref.get(ctx, item.id)
-                // Explicitly chosen source (detail page, round 14) before explicitly chosen quality before automatic
-                val fixedSrc = vp.third?.let { l -> alts.indexOfFirst { it.label == l } }?.takeIf { it >= 0 }
-                val fixed = vp.first?.let { q -> alts.indexOfFirst { it.quality == q } }?.takeIf { it >= 0 }
-                if (fixedSrc != null && !DeadLinks.isDead(alts[fixedSrc].url)) {
-                    playUrl = alts[fixedSrc].url
-                } else if (fixed != null) {
-                    playUrl = alts[fixed].url
-                } else if (PlaybackPrefs.quality == QualityLogic.AUTO && rc > cap && QualityLogic.rank(alts[best].quality) <= cap) {
-                    playUrl = alts[best].url
-                    note = (alts[chosen].quality ?: "Diese Qualität") + " passt nicht zu diesem Gerät – spiele " + (alts[best].quality ?: "SD")
-                } else if (DeadLinks.isDead(url)) {
-                    // chosen source is known to be broken: take another one right away
-                    alts.indices.firstOrNull { it != chosen && !DeadLinks.isDead(alts[it].url) }?.let { playUrl = alts[it].url; note = "Quelle gestört – spiele eine andere" }
+    fun refreshChannels() {
+        if (isRefreshing) return
+        scope.launch {
+            isRefreshing = true
+            refreshError = null
+            catalogStatus = tr(language, 4)
+            try {
+                val result = RemoteChannelCatalog.fetch()
+                channelList = (result.channels + builtInChannels).distinctBy { it.id }
+                if (selectedChannelId != null && channelList.none { it.id == selectedChannelId }) {
+                    selectChannel(channelList.first().id)
                 }
-            }
-        }
-        playing = PlayReq(title, playUrl, item.id, item.kind == Kind.LIVE, startMs, tmdb, season, ep, alts, note)
-    }
-
-    /** EPG (sidebar/tile): start the last watched channel (otherwise the first) and show the TV guide right away. */
-    fun openEpg() {
-        val ch = History.ids.firstNotNullOfOrNull { id -> liveAll.firstOrNull { it.id == id } } ?: liveAll.firstOrNull() ?: return
-        AppNav.focusTab = -1
-        ZapContext.list = liveAll; ZapContext.key = "ALL"
-        AppNav.openGuide = true
-        start(ch, ch.title, ch.url)
-    }
-
-    /** Switch area; "EPG" is not a screen of its own but opens the TV guide in the player. */
-    // Area switched (tile, "Show all", sidebar): put the focus into the new content.
-    // Otherwise it falls back to the first element, which is the sidebar – it expands by itself (round 15).
-    var jumpTick by remember { mutableIntStateOf(0) }
-    LaunchedEffect(jumpTick) {
-        if (jumpTick == 0) return@LaunchedEffect
-        val id = tab
-        delay(150)
-        repeat(20) {
-            if (ContentFocus.tab == id && runCatching { ContentFocus.req.requestFocus() }.getOrDefault(false)) return@LaunchedEffect
-            delay(120)
-        }
-    }
-    fun goTab(id: Int) {
-        if (id == MenuLogic.EPG) { openEpg(); return }
-        tab = id; CatMemory.reset()
-        jumpTick++
-    }
-
-    val open: (Item) -> Unit = { i ->
-        if (i.kind == Kind.SERIES) NewEpisodes.dismiss(ctx, i.id)
-        LastFocus.pending = i.id
-        if (i.kind == Kind.LIVE) start(i, i.title, i.url) else pushTop(i)
-    }
-
-    // Reminder notification tapped: open the channel as soon as the list is loaded
-    LaunchedEffect(AppNav.openChannel, liveAll) {
-        val id = AppNav.openChannel ?: return@LaunchedEffect
-        val ch = liveAll.firstOrNull { it.id == id } ?: return@LaunchedEffect
-        AppNav.openChannel = null
-        General.startupHandled = true
-        top = null; browse = null; cats = null; adding = false
-        start(ch, ch.title, ch.url)
-    }
-    // Phone search: title the phone wants to start (movie, episode, channel), as soon as the playlist is loaded
-    LaunchedEffect(RemoteHub.playReq, all) {
-        val r = RemoteHub.playReq ?: return@LaunchedEffect
-        val it = all.firstOrNull { x -> x.id == r.id } ?: return@LaunchedEffect
-        RemoteHub.playReq = null
-        RemoteUi.show = false
-        General.startupHandled = true
-        top = null; trail.clear(); browse = null; cats = null; adding = false
-        when (it.kind) {
-            Kind.LIVE -> { ZapContext.list = emptyList(); ZapContext.key = null; start(it, it.title, it.url) }
-            Kind.MOVIE -> {
-                // Already started? Then continue where you left off (as on the TV)
-                val we = WatchStore.entries.firstOrNull { w -> w.itemId == it.id && !w.next }
-                start(it, it.title, it.url, we?.pos ?: 0L)
-            }
-            Kind.SERIES -> {
-                val ep = LazySeries.full(it).episodes.firstOrNull { e -> e.season == r.season && e.num == r.ep }
-                if (ep != null) {
-                    // Same episode already started: continue at the remembered position
-                    val we = WatchStore.entries.firstOrNull { w -> w.itemId == it.id && !w.next && w.season == ep.season && w.ep == ep.num }
-                    start(it, it.title + " S" + ep.season + "E" + ep.num, pickVariant(ep, null, null, null, PlaybackPrefs.cap(ctx)).url, we?.pos ?: 0L)
-                }
-            }
-        }
-    }
-    // "Stop" on the phone: close the player
-    LaunchedEffect(RemoteHub.closeTick) { if (RemoteHub.closeTick > 0 && playing != null) playing = null }
-    // Reminders while the app is open: card with "Switch" (instead of a notification)
-    var remindNow by remember { mutableStateOf<Reminder?>(null) }
-    LaunchedEffect(Unit) {
-        while (true) {
-            if (remindNow == null) Reminders.pending(System.currentTimeMillis() / 1000).firstOrNull()?.let { r ->
-                Reminders.markDone(ctx, r); remindNow = r
-            }
-            delay(15_000)
-        }
-    }
-
-    // Settings "Play last channel / last movie or series at start" (once per app start).
-    // What counts is what ran last: a channel or a movie / series.
-    LaunchedEffect(all.isNotEmpty()) {
-        if (all.isNotEmpty() && !General.startupHandled) {
-            General.startupHandled = true
-            val lastId = History.ids.firstOrNull()
-            val last = if (lastId == null || playing != null) null else all.firstOrNull { it.id == lastId }
-            if (last != null && last.kind == Kind.LIVE && General.resumeLive) start(last, last.title, last.url)
-            else if (last != null && last.kind != Kind.LIVE && General.resumeVod) {
-                // only with a remembered position (fully watched movies do not start from the beginning; for series possibly the next episode)
-                val e = WatchStore.entries.firstOrNull { it.itemId == last.id }
-                if (e != null) {
-                    pushTop(last)
-                    val t = WatchStore.target(ctx, last, e)
-                    start(last, t.first, t.second, e.pos)
-                }
+                catalogUpdatedAt = result.updatedAt
+                catalogStatus = "${tr(language, 5)} · ${tr(language, 6)}: ${result.channels.size}"
+            } catch (error: Exception) {
+                if (channelList.isEmpty()) channelList = builtInChannels
+                catalogStatus = tr(language, 8)
+                refreshError = error.message ?: tr(language, 7)
+            } finally {
+                isRefreshing = false
             }
         }
     }
 
-    BoxWithConstraints(Modifier.fillMaxSize().background(Bg).fitScreenInset(playing == null)) {
-        // Scale of the design from the available width (see Design)
-        val dk = maxWidth.value / Design.WIDTH
-        SideEffect { if (Design.k != dk) Design.k = dk }
-        val p = playing
-        val d = detail
-        val b = browse
-        val c = cats
-        when {
-            p != null -> {
-                val zap = if (p.live || p.archive != null) {
-                    val ctxList = ZapContext.list
-                    if (ctxList.any { it.id == p.itemId }) ctxList
-                    else {
-                        val g = liveAll.firstOrNull { it.id == p.itemId }?.group
-                        liveAll.filter { it.group == g }
-                    }
-                } else emptyList()
-                val seriesBase = remember(p.itemId, all) {
-                    if (p.live || p.archive != null) null else all.firstOrNull { it.id == p.itemId }?.let { LazySeries.full(it) }
-                }
-                // Series with a placeholder (e.g. Resume from the home screen): fetch episodes in the background, the player uses them right after
-                val seriesItem by produceState(seriesBase, seriesBase) {
-                    value = seriesBase
-                    val b = seriesBase
-                    if (b != null && LazySeries.isStub(b)) LazySeries.load(ctx, b)?.let { value = it }
-                }
-                // New start from outside (e.g. reminder "Switch") during playback: rebuild the player
-                key(p) {
-                    PlayerScreen(p, zap, liveAll, seriesItem) {
-                        // Live: back in Live TV on the last watched channel (also after switching in the player)
-                        if (p.live || p.archive != null) LastFocus.pending = History.ids.firstOrNull { id -> liveAll.any { it.id == id } }
-                        playing = null
-                    }
-                }
-            }
-            // Round 17: every screen fades in softly (screenEnter); the player deliberately without an effect
-            personTop != null -> key(personTop.id) { Box(Modifier.fillMaxSize().screenEnter()) { PersonScreen(personTop, all, onOpen = { pushTop(it) }, onBack = { popTop() }) } }
-            d != null -> key(d.id) { Box(Modifier.fillMaxSize().screenEnter()) {
-                DetailScreen(
-                    d, all, onPlay = { url, t, pos -> start(d, t, url, pos) },
-                    onPerson = { pushTop(it) }, onOpenItem = { pushTop(it) }, onBack = { popTop() }
+    BackHandler(enabled = selectedChannelId != null && languageChosen && !showSettings) {
+        selectedChannelId = null
+        favoritesTab = false
+    }
+    DisposableEffect(selectedChannelId) {
+        val activity = context as? Activity
+        val decor = activity?.window?.decorView
+        val originalFlags = decor?.systemUiVisibility ?: 0
+        if (selectedChannelId != null && languageChosen) {
+            decor?.systemUiVisibility = (
+                View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 )
-            } }
-            b != null -> Box(Modifier.fillMaxSize().screenEnter()) { BrowseScreen(
-                b, gridState, tab, onOpen = open,
-                onBack = { browse = null },
-                onGoTab = { if (it != MenuLogic.EPG) { browse = null; cats = null }; goTab(it) },
-                // Started from the cinema view: put the title's detail page underneath so "Back" lands there (not in the cinema view again)
-                all = all, onPlay = { i, t, url, pos -> if (i.kind != Kind.LIVE) pushTop(i); start(i, t, url, pos) }, onPerson = { pushTop(it) }
-            ) }
-            c != null -> Box(Modifier.fillMaxSize().screenEnter()) { CategoriesScreen(
-                c, tab,
-                onPick = { name, list, sort -> browse = BrowseState(BrowseReq(name, list, sort)) },
-                onOpen = open,
-                onBack = { cats = null },
-                onGoTab = { if (it != MenuLogic.EPG) cats = null; goTab(it) }
-            ) }
-            adding -> Box(Modifier.fillMaxSize().screenEnter()) { AddPlaylistScreen { adding = false } }
-            // Boomer mode: very simple home screen with big channel tiles instead of the normal UI
-            Boomer.enabled -> BoomerHome(
-                all, PlaylistStore.loading,
-                onPlay = { ch, list ->
-                    ZapContext.list = list; ZapContext.key = null
-                    start(ch, ch.title, ch.url)
+        } else {
+            decor?.systemUiVisibility = originalFlags and View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY.inv()
+        }
+        onDispose { decor?.systemUiVisibility = originalFlags }
+    }
+
+    LaunchedEffect(Unit) { refreshChannels() }
+    LaunchedEffect(selectedChannelId) {
+        if (selectedChannelId == null && languageChosen) {
+            runCatching { settingsFocusRequester.requestFocus() }
+        }
+    }
+
+    MaterialTheme(colorScheme = colors) {
+        val selectedChannel = channelList.firstOrNull { it.id == selectedChannelId }
+        Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+            if (!languageChosen) {
+                LanguagePicker(language = language, onChoose = { code ->
+                    language = code
+                    languageChosen = true
+                    prefs.edit().putString("language", code).putBoolean("language_selected", true).apply()
+                    selectChannel(selectedChannelId ?: channelList.first().id)
+                })
+            } else if (selectedChannel != null) {
+                LitePlayer(
+                    channel = selectedChannel,
+                    language = language,
+                    controlsTimeout = controlsTimeout,
+                    isFavorite = selectedChannel.id in favorites,
+                    onBack = { selectedChannelId = null },
+                    onPrevious = { changeChannel(-1) },
+                    onNext = { changeChannel(1) },
+                    onToggleFavorite = {
+                        persistFavorites(if (selectedChannel.id in favorites) favorites - selectedChannel.id else favorites + selectedChannel.id)
+                    },
+                    onOpenSettings = { showSettings = true },
+                    onOpenList = { selectedChannelId = null }
+                )
+            } else {
+                ChannelHome(
+                    channelList = channelList,
+                    language = language,
+                    favorites = favorites,
+                    favoritesTab = favoritesTab,
+                    isRefreshing = isRefreshing,
+                    catalogStatus = catalogStatus,
+                    catalogUpdatedAt = catalogUpdatedAt,
+                    refreshError = refreshError,
+                    settingsFocusRequester = settingsFocusRequester,
+                    onTabChange = { favoritesTab = it },
+                    onSelect = { selectChannel(it) },
+                    onToggleFavorite = { id ->
+                        persistFavorites(if (id in favorites) favorites - id else favorites + id)
+                    },
+                    onRefresh = { refreshChannels() },
+                    onSettings = { showSettings = true }
+                )
+            }
+        }
+        if (showSettings) {
+            SettingsDialog(
+                language = language,
+                controlsTimeout = controlsTimeout,
+                themeChoice = themeChoice,
+                onLanguage = {
+                    language = it
+                    prefs.edit().putString("language", it).apply()
                 },
-                // Movie: starts immediately (Back leads to the detail page underneath); series: episode list
-                onVod = { i ->
-                    LastFocus.pending = i.id
-                    if (i.kind == Kind.SERIES) pushTop(i) else { pushTop(i); start(i, i.title, i.url) }
+                onTimeout = {
+                    controlsTimeout = it
+                    prefs.edit().putInt("controls_timeout", it).apply()
                 },
-                onResume = { e, i ->
-                    LastFocus.pending = i.id
-                    pushTop(i)
-                    val t = WatchStore.target(ctx, i, e)
-                    start(i, t.first, t.second, e.pos)
-                }
+                onTheme = {
+                    themeChoice = it
+                    prefs.edit().putInt("theme_choice", it).apply()
+                },
+                onDismiss = { showSettings = false }
             )
-            tab == 4 && all.isNotEmpty() -> Box(Modifier.fillMaxSize().screenEnter()) { SearchScreen(
-                tab = tab, state = states[4],
-                onOpen = open,
-                onBrowse = { browse = BrowseState(it) },
-                onTab = { goTab(it) }
-            ) }
-            else -> Box(Modifier.fillMaxSize().screenEnter(tab)) { HomeScreen(
-                tab = tab, onTab = { goTab(it) }, states = states,
-                onOpen = open,
-                onPlayNow = { i -> LastFocus.pending = i.id; if (i.kind == Kind.SERIES) pushTop(i) else { if (i.kind != Kind.LIVE && !i.id.startsWith("rec:")) pushTop(i); start(i, i.title, i.url) } },
-                onResume = { e, i ->
-                    LastFocus.pending = i.id
-                    if (i.kind != Kind.LIVE) pushTop(i)
-                    // current address from the loaded playlist instead of the stored one (providers change addresses)
-                    val t = WatchStore.target(ctx, i, e)
-                    start(i, t.first, t.second, e.pos)
-                },
-                onBrowse = { browse = BrowseState(it) },
-                onCategories = { cats = it },
-                onAdd = { adding = true }
-            ) }
         }
-        if (RemoteUi.show) RemoteOverlay(Modifier.align(Alignment.Center))
-        // Live preview of the View settings: bar at the bottom, the real app stays visible
-        if (ViewLive.active) ViewLivePanel(ctx, goTab = { goTab(it) }, closeCats = { cats = null; browse = null }) {
-            ViewLive.active = false
-            SettingsNav.openPage = 2
-            goTab(MenuLogic.SETTINGS)
+    }
+}
+
+@Composable
+private fun LanguagePicker(language: String, onChoose: (String) -> Unit) {
+    val choices = listOf("ru", "de", "en", "uk", "ro", "tr")
+    Column(
+        Modifier.fillMaxSize().padding(28.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text("PASHA TV", style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.height(12.dp))
+        Text(extra(language, 0), style = MaterialTheme.typography.headlineSmall)
+        Spacer(Modifier.height(8.dp))
+        Text(extra(language, 25), color = MaterialTheme.colorScheme.secondary)
+        Spacer(Modifier.height(22.dp))
+        choices.forEach { code ->
+            val name = languageNames[code] ?: code
+            FocusActionButton(
+                label = name,
+                onClick = { onChoose(code) },
+                modifier = Modifier.widthIn(min = 240.dp).fillMaxWidth(0.55f).padding(vertical = 3.dp)
+            )
         }
-        // Genre-Erkennung im Hintergrund: dezent oben rechts, nie im Player
-        if (p == null && !adding) MetaBadge(Modifier.align(Alignment.TopEnd).padding(top = 16.dp, end = 22.dp))
-        remindNow?.let { r ->
-            ReminderCard(r, Modifier.align(Alignment.TopCenter).padding(top = 24.dp), onClose = { remindNow = null }) {
-                remindNow = null
-                val ch = liveAll.firstOrNull { it.id == r.chId }
-                if (ch != null) { top = null; browse = null; cats = null; start(ch, ch.title, ch.url) }
+    }
+}
+
+@Composable
+private fun ChannelHome(
+    channelList: List<Channel>,
+    language: String,
+    favorites: Set<String>,
+    favoritesTab: Boolean,
+    isRefreshing: Boolean,
+    catalogStatus: String,
+    catalogUpdatedAt: String?,
+    refreshError: String?,
+    settingsFocusRequester: FocusRequester,
+    onTabChange: (Boolean) -> Unit,
+    onSelect: (String) -> Unit,
+    onToggleFavorite: (String) -> Unit,
+    onRefresh: () -> Unit,
+    onSettings: () -> Unit
+) {
+    val compact = true
+    var selectedGroup by remember(favoritesTab) { mutableStateOf("all") }
+    val visibleChannels = if (favoritesTab) channelList.filter { it.id in favorites } else channelList
+    val groups = visibleChannels.map { it.group }.distinct().sorted()
+    val filteredChannels = if (selectedGroup == "all" || selectedGroup !in groups) visibleChannels else visibleChannels.filter { it.group == selectedGroup }
+    Column(Modifier.fillMaxSize().padding(horizontal = 22.dp, vertical = 14.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text("PASHA TV", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+                Text(extra(language, 26), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.secondary)
+            }
+            FocusActionButton(label = "⚙  ${extra(language, 24)}", onClick = onSettings, modifier = Modifier.focusRequester(settingsFocusRequester))
+            Spacer(Modifier.width(10.dp))
+            FocusActionButton(label = if (isRefreshing) "⟳  Обновление…" else "⟳  Обновить", onClick = onRefresh)
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            FocusActionButton(label = "▤  ${extra(language, 1)}", onClick = { onTabChange(false) }, selected = !favoritesTab)
+            FocusActionButton(label = "★  ${extra(language, 2)} (${favorites.size})", onClick = { onTabChange(true) }, selected = favoritesTab)
+        }
+        if (groups.isNotEmpty()) {
+            Row(
+                Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(7.dp)
+            ) {
+                FocusActionButton(
+                    label = extra(language, 1),
+                    onClick = { selectedGroup = "all" },
+                    selected = selectedGroup == "all"
+                )
+                groups.forEach { group ->
+                    FocusActionButton(
+                        label = group,
+                        onClick = { selectedGroup = group },
+                        selected = selectedGroup == group
+                    )
+                }
+            }
+        }
+        Column {
+            Text(catalogStatus, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.secondary)
+            if (catalogUpdatedAt != null) Text(catalogUpdatedAt, style = MaterialTheme.typography.labelSmall)
+            if (refreshError != null) Text(refreshError, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.error)
+        }
+        if (filteredChannels.isEmpty()) {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(
+                    if (favoritesTab && visibleChannels.isEmpty()) extra(language, 3) else extra(language, 1),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(bottom = 14.dp)
+            ) {
+                items(filteredChannels, key = { it.id }) { channel ->
+                    ChannelRow(
+                        channel = channel,
+                        isFavorite = channel.id in favorites,
+                        onSelect = { onSelect(channel.id) },
+                        onToggleFavorite = { onToggleFavorite(channel.id) }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ChannelRow(
+    channel: Channel,
+    isFavorite: Boolean,
+    onSelect: () -> Unit,
+    onToggleFavorite: () -> Unit
+) {
+    var focused by remember { mutableStateOf(false) }
+    val borderWidth by animateDpAsState(if (focused) 3.dp else 0.dp, label = "channelFocus")
+    Card(
+        modifier = Modifier.fillMaxWidth()
+            .onFocusChanged { focused = it.isFocused }
+            .border(BorderStroke(borderWidth, MaterialTheme.colorScheme.primary), RoundedCornerShape(14.dp))
+            .clickable(onClick = onSelect),
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(containerColor = if (focused) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface)
+    ) {
+        Row(Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text(channel.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text(channel.group, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.secondary)
+            }
+            FocusActionButton(
+                label = if (isFavorite) "★" else "☆",
+                onClick = onToggleFavorite,
+                selected = isFavorite
+            )
+        }
+    }
+}
+
+@Composable
+private fun FocusActionButton(
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    selected: Boolean = false
+) {
+    var focused by remember { mutableStateOf(false) }
+    val borderWidth by animateDpAsState(if (focused) 3.dp else 1.dp, label = "buttonFocus")
+    Button(
+        onClick = onClick,
+        modifier = modifier.onFocusChanged { focused = it.isFocused }
+            .border(BorderStroke(borderWidth, if (focused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline), RoundedCornerShape(12.dp)),
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (selected || focused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = if (selected || focused) Color(0xFF07142F) else MaterialTheme.colorScheme.onSurface
+        ),
+        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp)
+    ) {
+        Text(label, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+    }
+}
+
+@Composable
+private fun SettingsDialog(
+    language: String,
+    controlsTimeout: Int,
+    themeChoice: Int,
+    onLanguage: (String) -> Unit,
+    onTimeout: (Int) -> Unit,
+    onTheme: (Int) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val languages = listOf("ru", "de", "en", "uk", "ro", "tr")
+    val timeoutOptions = listOf(1, 3, 5, 10, 0)
+    val themeNames = listOf(extra(language, 12), extra(language, 13), extra(language, 14))
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(extra(language, 24), style = MaterialTheme.typography.headlineSmall) },
+        text = {
+            Column(
+                Modifier.heightIn(max = 540.dp).verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Text(tr(language, 2), style = MaterialTheme.typography.titleMedium)
+                languages.forEach { code ->
+                    SettingsChoice(languageNames[code] ?: code, language == code) { onLanguage(code) }
+                }
+                Divider()
+                Text(extra(language, 5), style = MaterialTheme.typography.titleMedium)
+                timeoutOptions.forEach { value ->
+                    val label = when (value) {
+                        1 -> extra(language, 6)
+                        3 -> extra(language, 7)
+                        5 -> extra(language, 8)
+                        10 -> extra(language, 9)
+                        else -> extra(language, 10)
+                    }
+                    SettingsChoice(label, controlsTimeout == value) { onTimeout(value) }
+                }
+                Divider()
+                Text(extra(language, 27), style = MaterialTheme.typography.titleMedium)
+                themeNames.forEachIndexed { index, name ->
+                    SettingsChoice(name, themeChoice == index) { onTheme(index) }
+                }
+                Divider()
+                Text(extra(language, 15), style = MaterialTheme.typography.titleMedium)
+                Text(extra(language, 16), color = MaterialTheme.colorScheme.secondary)
+            }
+        },
+        confirmButton = { FocusActionButton(label = "OK", onClick = onDismiss) }
+    )
+}
+
+@Composable
+private fun SettingsChoice(label: String, selected: Boolean, onClick: () -> Unit) {
+    var focused by remember { mutableStateOf(false) }
+    val borderWidth by animateDpAsState(if (focused) 2.dp else 0.dp, label = "settingFocus")
+    Row(
+        Modifier.fillMaxWidth().onFocusChanged { focused = it.isFocused }
+            .border(BorderStroke(borderWidth, MaterialTheme.colorScheme.primary), RoundedCornerShape(10.dp))
+            .clickable(onClick = onClick).padding(horizontal = 8.dp, vertical = 5.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        RadioButton(selected = selected, onClick = onClick)
+        Text(label, style = MaterialTheme.typography.bodyLarge)
+    }
+}
+
+@Composable
+private fun LitePlayer(
+    channel: Channel,
+    language: String,
+    controlsTimeout: Int,
+    isFavorite: Boolean,
+    onBack: () -> Unit,
+    onPrevious: () -> Unit,
+    onNext: () -> Unit,
+    onToggleFavorite: () -> Unit,
+    onOpenSettings: () -> Unit,
+    onOpenList: () -> Unit
+) {
+    val context = LocalContext.current
+    val exoPlayer = remember(context) { ExoPlayer.Builder(context).build() }
+    val playerFocusRequester = remember { FocusRequester() }
+    val firstControlFocusRequester = remember { FocusRequester() }
+    var controlsVisible by remember { mutableStateOf(controlsTimeout == 0) }
+    var isPlaying by remember { mutableStateOf(true) }
+    var interactionTick by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(channel.url) {
+        exoPlayer.setMediaItem(MediaItem.fromUri(channel.url))
+        exoPlayer.prepare()
+        exoPlayer.playWhenReady = true
+        isPlaying = true
+    }
+    DisposableEffect(exoPlayer) { onDispose { exoPlayer.release() } }
+
+    LaunchedEffect(controlsTimeout) {
+        if (controlsTimeout == 0) controlsVisible = true
+    }
+    LaunchedEffect(controlsVisible, controlsTimeout, channel.id, interactionTick) {
+        if (controlsVisible && controlsTimeout > 0) {
+            delay(controlsTimeout * 1000L)
+            controlsVisible = false
+        }
+    }
+    LaunchedEffect(controlsVisible) {
+        if (controlsVisible) {
+            runCatching { firstControlFocusRequester.requestFocus() }
+        } else {
+            runCatching { playerFocusRequester.requestFocus() }
+        }
+    }
+    LaunchedEffect(Unit) { runCatching { playerFocusRequester.requestFocus() } }
+
+    Box(
+        Modifier.fillMaxSize()
+            .onPreviewKeyEvent { event ->
+                if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
+                if (event.key == Key.Back || event.key == Key.Escape) {
+                    onBack()
+                    return@onPreviewKeyEvent true
+                }
+                if (controlsVisible) {
+                    interactionTick++
+                    return@onPreviewKeyEvent false
+                }
+                when (event.key) {
+                    Key.DirectionUp, Key.DirectionLeft -> { interactionTick++; onPrevious(); true }
+                    Key.DirectionDown, Key.DirectionRight -> { interactionTick++; onNext(); true }
+                    Key.DirectionCenter, Key.Enter, Key.NumPadEnter -> { interactionTick++; controlsVisible = true; true }
+                    else -> false
+                }
+            }
+            .focusRequester(playerFocusRequester)
+            .focusable()
+    ) {
+        AndroidView(
+            factory = { viewContext ->
+                PlayerView(viewContext).apply {
+                    player = exoPlayer
+                    useController = false
+                    resizeMode = androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+                    keepScreenOn = true
+                    isFocusable = false
+                    isFocusableInTouchMode = false
+                }
+            },
+            update = { view ->
+                view.player = exoPlayer
+                view.resizeMode = androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+            },
+            modifier = Modifier.fillMaxSize()
+        )
+        if (controlsVisible) {
+            Surface(
+                modifier = Modifier.align(Alignment.TopCenter).padding(top = 18.dp),
+                color = Color(0xDD101820),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Row(Modifier.padding(horizontal = 12.dp, vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(channel.name, color = Color.White, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.width(16.dp))
+                    FocusActionButton(label = extra(language, 17), onClick = onOpenList, modifier = Modifier.focusRequester(firstControlFocusRequester))
+                }
+            }
+            Surface(
+                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 22.dp),
+                color = Color(0xDD101820),
+                shape = RoundedCornerShape(18.dp)
+            ) {
+                Row(
+                    Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    FocusActionButton(label = "◀  ${extra(language, 18)}", onClick = onPrevious)
+                    FocusActionButton(
+                        label = if (isPlaying) "Ⅱ  ${extra(language, 19)}" else "▶  ${extra(language, 20)}",
+                        onClick = {
+                            if (exoPlayer.isPlaying) {
+                                exoPlayer.pause()
+                                isPlaying = false
+                            } else {
+                                exoPlayer.play()
+                                isPlaying = true
+                            }
+                        }
+                    )
+                    FocusActionButton(label = "${extra(language, 21)}  ▶", onClick = onNext)
+                    FocusActionButton(label = if (isFavorite) "★" else "☆", onClick = onToggleFavorite, selected = isFavorite)
+                    FocusActionButton(label = "⚙", onClick = onOpenSettings)
+                }
             }
         }
     }
