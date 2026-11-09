@@ -36,7 +36,6 @@ object I18nCore {
                     4, 5 -> p.getOrElse(i) { "" }.ifEmpty { bs }
                     else -> p.getOrElse(i) { "" }.ifEmpty { en }
                 }
-            }
             if (PH.containsMatchIn(de)) {
                 val sb = StringBuilder("^")
                 var last = 0
