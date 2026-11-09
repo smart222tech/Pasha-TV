@@ -37,3 +37,19 @@ object PashaCatalog {
             null, "Россия", lang = "ru")
     )
 }
+
+
+/** Persists the last channel independently from legacy IPVIO history IDs. */
+object PashaLastChannel {
+    private const val PREFS = "pasha_tv_lite"
+    private const val KEY_LAST_CHANNEL = "last_channel_id"
+
+    fun save(context: android.content.Context, id: String) {
+        context.getSharedPreferences(PREFS, android.content.Context.MODE_PRIVATE)
+            .edit().putString(KEY_LAST_CHANNEL, id).apply()
+    }
+
+    fun get(context: android.content.Context): String? =
+        context.getSharedPreferences(PREFS, android.content.Context.MODE_PRIVATE)
+            .getString(KEY_LAST_CHANNEL, null)
+}
