@@ -1067,13 +1067,16 @@ fun PlayerScreen(req: PlayReq, zapList: List<Item>, liveAll: List<Item>, seriesI
                     cur.live && digitBuf.isNotEmpty() && (k == Key.DirectionCenter || k == Key.Enter) -> { commitDigits(); true }
                     controls || panel != Panel.NONE || showChannels || showGuide -> false
                     else -> when (k) {
-                        Key.DirectionLeft -> { if (cur.live) openChannels() else stepSeek(-1); true }
-                        Key.DirectionRight -> { if (cur.live) { controls = false; showGuide = true } else stepSeek(1); true }
+                        Key.DirectionLeft -> { if (cur.live) { if (General.pashaRemote) zap(-1) else openChannels() } else stepSeek(-1); true }
+                        Key.DirectionRight -> { if (cur.live) { if (General.pashaRemote) zap(1) else { controls = false; showGuide = true } } else stepSeek(1); true }
                         Key.DirectionCenter, Key.Enter -> {
                             val seg = activeSeg
                             if (showNextCard) { playEpisode(epList[epIdx + 1]); true }
                             else if (seg != null && segVisible) { skipSeg(seg); true }
-                            else if (cur.live) { controls = true; true }
+                            else if (cur.live) {
+                                if (General.pashaRemote) openChannels() else controls = true
+                                true
+                            }
                             // Like YouTube, Netflix & co.: during/shortly after seeking, OK confirms the target position and keeps playing
                             // instead of pausing (that happened because one wants to "confirm" the seek).
                             else if (scrubTarget >= 0) {

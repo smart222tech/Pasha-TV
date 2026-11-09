@@ -36,10 +36,10 @@ android {
         minSdk = 24
         targetSdk = 37
         // Raise both for every release; the GitHub release tag must match versionName (e.g. tag "v1.1").
-        versionCode = 3
-        versionName = "1.2"
+        versionCode = 4
+        versionName = "1.3"
         // Name unter dem Symbol; der Debug-Build überschreibt ihn (siehe buildTypes)
-        manifestPlaceholders["appLabel"] = "IPVIO Stream"
+        manifestPlaceholders["appLabel"] = "PASHA TV"
 
         buildConfigField("String", "TMDB_KEY", "\"${secret("TMDB_KEY")}\"")
         buildConfigField("String", "OMDB_KEY", "\"${secret("OMDB_KEY")}\"")
@@ -61,7 +61,7 @@ android {
         // nicht überschrieben wird. Beide Apps lassen sich parallel installieren (eigene Daten, eigener Name).
         debug {
             applicationIdSuffix = ".test"
-            manifestPlaceholders["appLabel"] = "IPVIO Stream"
+            manifestPlaceholders["appLabel"] = "PASHA TV"
         }
         release {
             if (hasKeystore) signingConfig = signingConfigs.getByName("release")

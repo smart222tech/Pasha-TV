@@ -18,7 +18,9 @@ object General {
     private const val PREFS = "ipvio_general"
     var autoStart by mutableStateOf(false)
     var startTab by mutableIntStateOf(0)
-    var resumeLive by mutableStateOf(false)
+    var resumeLive by mutableStateOf(true)
+    /** PASHA remote layout: left/right switch live channels; OK opens the channel list. */
+    var pashaRemote by mutableStateOf(true)
     /** Resume the last watched movie / series at start at the remembered position. */
     var resumeVod by mutableStateOf(false)
     var confirmExit by mutableStateOf(true)
@@ -113,7 +115,8 @@ object General {
         val p = prefs(c)
         autoStart = p.getBoolean("auto_start", false)
         startTab = p.getInt("start_tab", 0).coerceIn(0, 4)
-        resumeLive = p.getBoolean("resume_live", false)
+        resumeLive = p.getBoolean("resume_live", true)
+        pashaRemote = p.getBoolean("pasha_remote", true)
         resumeVod = p.getBoolean("resume_vod", false)
         confirmExit = p.getBoolean("confirm_exit", true)
         bundleLive = p.getBoolean("bundle_live", true)
@@ -150,6 +153,7 @@ object General {
     fun setAutoStart(c: Context, v: Boolean) { autoStart = v; prefs(c).edit().putBoolean("auto_start", v).apply() }
     fun setStartTab(c: Context, v: Int) { startTab = v.coerceIn(0, 4); prefs(c).edit().putInt("start_tab", startTab).apply() }
     fun setResumeLive(c: Context, v: Boolean) { resumeLive = v; prefs(c).edit().putBoolean("resume_live", v).apply() }
+    fun setPashaRemote(c: Context, v: Boolean) { pashaRemote = v; prefs(c).edit().putBoolean("pasha_remote", v).apply() }
     fun setResumeVod(c: Context, v: Boolean) { resumeVod = v; prefs(c).edit().putBoolean("resume_vod", v).apply() }
     fun setBundleLive(c: Context, v: Boolean) { bundleLive = v; prefs(c).edit().putBoolean("bundle_live", v).apply() }
     fun setConfirmExit(c: Context, v: Boolean) { confirmExit = v; prefs(c).edit().putBoolean("confirm_exit", v).apply() }
