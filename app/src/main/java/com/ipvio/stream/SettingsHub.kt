@@ -99,11 +99,12 @@ fun SettingsHub(onAdd: () -> Unit, reload: () -> Unit) {
                 Text("Einstellungen", color = Color.White, fontSize = spx(38), fontWeight = FontWeight.ExtraBold)
                 Text("Alles rund um Aussehen, Wiedergabe und Konto", color = Tok.TextLow, fontSize = spx(16))
             }
-            CATS.chunked(3).forEachIndexed { r, row ->
+            val visibleCats = CATS.withIndex().filter { it.index != 9 && it.index != 15 }
+            visibleCats.chunked(3).forEach { row ->
                 Row(horizontalArrangement = Arrangement.spacedBy(dpx(16))) {
-                    row.forEachIndexed { c, cat ->
-                        val idx = r * 3 + c
-                        SettingsCard(cat, idx, Modifier.weight(1f).focusRequester(cardFocus[idx])) { last = idx; page = idx }
+                    row.forEach { entry ->
+                        val idx = entry.index
+                        SettingsCard(entry.value, idx, Modifier.weight(1f).focusRequester(cardFocus[idx])) { last = idx; page = idx }
                     }
                     repeat(3 - row.size) { Spacer(Modifier.weight(1f)) }
                 }
@@ -135,7 +136,7 @@ fun SettingsHub(onAdd: () -> Unit, reload: () -> Unit) {
                 4 -> MenuPage(ctx)
                 5 -> PlayerPage(ctx)
                 6 -> AudioPage(ctx)
-                7 -> FilterPage(ctx) { page = 9 }
+                7 -> FilterPage(ctx) { /* content playlist management is disabled in PASHA TV */ }
                 8 -> LivePage(ctx)
                 9 -> PlaylistPage(ctx, onAdd, reload)
                 10 -> ProfilesPage(ctx) { page = -1 }
