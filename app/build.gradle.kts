@@ -61,7 +61,7 @@ android {
         // nicht überschrieben wird. Beide Apps lassen sich parallel installieren (eigene Daten, eigener Name).
         debug {
             applicationIdSuffix = ".test"
-            manifestPlaceholders["appLabel"] = "IPVIO Stream"
+            manifestPlaceholders["appLabel"] = "PASHA TV"
         }
         release {
             if (hasKeystore) signingConfig = signingConfigs.getByName("release")
