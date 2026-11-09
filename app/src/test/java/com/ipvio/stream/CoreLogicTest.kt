@@ -130,7 +130,7 @@ http://h/x
     }
 
     // ---------------------------------------------------------------- Menü
-    @Test fun menue_standard() = assertEquals(listOf(0, 3, 1, 2, 10, 6, 7, 8, 9, 4, 5), MenuLogic.parseOrder(null))
+    @Test fun menue_standard() = assertEquals(listOf(3, 7, 1, 2, 5, 0, 4, 6, 8, 9, 10), MenuLogic.parseOrder(null))
 
     @Test fun menue_alteReihenfolge_neueBereicheVorEinstellungen() {
         assertEquals(listOf(0, 1, 2, 3, 4, 6, 7, 8, 9, 10, 5), MenuLogic.parseOrder("0,1,2,3,4,5"))
@@ -144,19 +144,19 @@ http://h/x
         assertEquals(MenuLogic.COUNT, o.toSet().size)
     }
 
-    @Test fun menue_startUndEinstellungenBleibenImmerSichtbar() {
-        assertEquals(listOf(1, 2, 6), MenuLogic.parseHidden("0,1,2,5,6,19"))
+    @Test fun menue_einstellungenBleibenImmerSichtbar() {
+        assertEquals(listOf(0, 1, 2, 6), MenuLogic.parseHidden("0,1,2,5,6,19"))
         assertEquals(emptyList<Int>(), MenuLogic.toggle(emptyList(), 0))
         assertEquals(emptyList<Int>(), MenuLogic.toggle(emptyList(), 5))
         val all = MenuLogic.visible(MenuLogic.DEFAULT_ORDER, listOf(1, 2, 3, 4, 6, 7, 8, 9, 10))
-        assertEquals(listOf(0, 5), all)
+        assertEquals(listOf(5, 0), all)
     }
 
     @Test fun menue_verschiebenUndGrenzen() {
         val o = MenuLogic.DEFAULT_ORDER
-        assertEquals(listOf(3, 0, 1, 2, 10, 6, 7, 8, 9, 4, 5), MenuLogic.move(o, 0, 1))
-        assertEquals(o, MenuLogic.move(o, 0, -1))
-        assertEquals(o, MenuLogic.move(o, 5, 1))
+        assertEquals(listOf(7, 3, 1, 2, 5, 0, 4, 6, 8, 9, 10), MenuLogic.move(o, 3, 1))
+        assertEquals(o, MenuLogic.move(o, 3, -1))
+        assertEquals(o, MenuLogic.move(o, 10, 1))
         assertEquals(o, MenuLogic.move(o, 99, 1))
     }
 

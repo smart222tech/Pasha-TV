@@ -2,7 +2,7 @@ name: Build APK
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, custom/pasha-tv-ui, pasha-tv-minimal ]
   pull_request:
   workflow_dispatch:
 
