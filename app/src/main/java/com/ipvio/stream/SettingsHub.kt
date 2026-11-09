@@ -386,11 +386,12 @@ internal fun PinPad(title: String, hint: String?, error: String?, onSubmit: (Str
 
 @Composable
 private fun RegionPage(ctx: Context) {
-    val langOpts = listOf("Automatisch (Gerät)") + I18nCore.NATIVE
-    val li = if (General.lang.isBlank()) 0 else I18nCore.CODES.indexOf(General.lang) + 1
+    val langOpts = I18nCore.NATIVE
+    val li = I18nCore.CODES.indexOf(General.lang).takeIf { it >= 0 }
+        ?: I18nCore.indexForSystem(java.util.Locale.getDefault().language)
     SectionTitle("Sprache")
-    SelectRow("Sprache der App", if (li == 0) "Automatisch (Gerät)" else I18nCore.NATIVE[li - 1], langOpts, li) {
-        General.setLang(ctx, if (it == 0) "" else I18nCore.CODES[it - 1])
+    SelectRow("Sprache der App", I18nCore.NATIVE[li], langOpts, li) {
+        General.setLang(ctx, I18nCore.CODES[it])
     }
     Hint("Alle Menüs und Hinweise erscheinen in dieser Sprache. Beschreibungen, Besetzung und Titel-Infos kommen von TMDB und werden in derselben Sprache geladen, sobald du einen Titel öffnest. Namen von Sendern, Filmen und Kategorien stammen von deinem Anbieter und bleiben unverändert.")
     SectionTitle("Uhrzeit")
