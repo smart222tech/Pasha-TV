@@ -31,7 +31,7 @@ data class UpdateInfo(val code: Long, val name: String, val apkUrl: String, val 
  */
 object AppUpdate {
     /** Built-in update address: the latest release of the project on GitHub. */
-    const val DEFAULT_URL = "https://api.github.com/repos/Emrodev/IPVIO-Stream/releases/latest"
+    const val DEFAULT_URL = "https://api.github.com/repos/smart222tech/Pasha-TV-FORK-TEST/releases/latest"
 
     /** Found update (for the bell), null = none known. */
     var available by mutableStateOf<UpdateInfo?>(null)
@@ -57,7 +57,7 @@ object AppUpdate {
         runCatching {
             val u = url(c)
             if (u.isBlank()) error("Keine Update-Adresse eingetragen")
-            val req = Request.Builder().url(u).header("User-Agent", "IPVIO Stream")
+            val req = Request.Builder().url(u).header("User-Agent", "PASHA TV Lite")
                 .header("Accept", "application/vnd.github+json").build()
             Net.base.newCall(req).execute().use { r ->
                 if (r.code == 404) error("Noch keine Veröffentlichung gefunden")
@@ -131,9 +131,9 @@ object AppUpdate {
     suspend fun download(c: Context, info: UpdateInfo, onProgress: (Int) -> Unit): Result<File> = withContext(Dispatchers.IO) {
         runCatching {
             val dir = File(c.cacheDir, "updates").apply { mkdirs(); listFiles()?.forEach { it.delete() } }
-            val out = File(dir, "ipvio-update.apk")
+            val out = File(dir, "pasha-tv-lite-update.apk")
             val client = Net.withTimeouts(15, 60)
-            client.newCall(Request.Builder().url(info.apkUrl).header("User-Agent", "IPVIO Stream").build()).execute().use { r ->
+            client.newCall(Request.Builder().url(info.apkUrl).header("User-Agent", "PASHA TV Lite").build()).execute().use { r ->
                 if (!r.isSuccessful) error("Fehler ${r.code}")
                 val body = r.body ?: error("Leere Antwort")
                 val total = body.contentLength()
