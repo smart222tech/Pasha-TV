@@ -211,7 +211,8 @@ private fun AppContent() {
     LaunchedEffect(Unit) {
         withContext(Dispatchers.IO) { General.cleanupLegacy(ctx) }
         PlaylistStore.installBuiltIn(ctx, PashaCatalog.channels)
-        General.resumeLive = true
+        // PASHA TV Lite always resumes the last watched channel on every app launch.
+        General.setResumeLive(ctx, true)
     }
 
     // Back in the app after the Home key: to the home screen (a running playback and adding stay as they are)
@@ -233,6 +234,7 @@ private fun AppContent() {
 
     fun start(item: Item, title: String, url: String, startMs: Long = 0L) {
         History.add(ctx, item.id)
+        if (item.kind == Kind.LIVE && item.id.startsWith("pasha:")) PashaLastChannel.save(ctx, item.id)
         val sm = SE_RE.find(title)
         val season = sm?.groupValues?.get(1)?.toIntOrNull() ?: 0
         val ep = sm?.groupValues?.get(2)?.toIntOrNull() ?: 0
@@ -356,10 +358,16 @@ private fun AppContent() {
     LaunchedEffect(all.isNotEmpty()) {
         if (all.isNotEmpty() && !General.startupHandled) {
             General.startupHandled = true
-            val lastId = History.ids.firstOrNull()
-            val last = if (lastId == null || playing != null) null else all.firstOrNull { it.id == lastId }
-            if (last != null && last.kind == Kind.LIVE && General.resumeLive) start(last, last.title, last.url)
-            else if (last != null && last.kind != Kind.LIVE && General.resumeVod) {
+            val lastId = PashaLastChannel.get(ctx)
+                ?: History.ids.firstOrNull { id -> liveAll.any { it.id == id } }
+            val last = if (playing != null) null else
+                all.firstOrNull { it.id == lastId && it.kind == Kind.LIVE }
+                    ?: liveAll.firstOrNull()
+            if (last != null && General.resumeLive) {
+                ZapContext.list = liveAll
+                ZapContext.key = "ALL"
+                start(last, last.title, last.url)
+            } else if (last != null && last.kind != Kind.LIVE && General.resumeVod) {
                 // only with a remembered position (fully watched movies do not start from the beginning; for series possibly the next episode)
                 val e = WatchStore.entries.firstOrNull { it.itemId == last.id }
                 if (e != null) {
