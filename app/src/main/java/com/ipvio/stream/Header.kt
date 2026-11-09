@@ -94,8 +94,6 @@ fun HeaderBar(
             Spacer(Modifier.width(dpx(14)))
         }
         BellButton(onReminder, onNewEpisode)
-        Spacer(Modifier.width(dpx(14)))
-        ProfileCircle(onProfile)
     }
 }
 
