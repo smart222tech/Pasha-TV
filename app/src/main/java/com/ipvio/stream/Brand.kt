@@ -6,15 +6,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.runtime.Composable
 
-/**
- * The IPVIO mark (play symbol with a gradient) as an image: res/drawable/ic_brand_mark.png.
- * The "IPVIO" lettering is set next to it as white text.
- */
+/** PASHA TV Lite forward-motion brand mark, shared with the launcher icon. */
 @Composable
 fun BrandMark(modifier: Modifier = Modifier) {
     Image(
-        painter = painterResource(R.drawable.ic_brand_mark),
-        contentDescription = null,
+        painter = painterResource(R.drawable.ic_launcher_foreground),
+        contentDescription = "PASHA TV Lite",
         modifier = modifier,
         contentScale = ContentScale.Fit
     )
