@@ -31,7 +31,7 @@
         android:label="${appLabel}"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:banner="@drawable/banner"
+        android:banner="@drawable/pasha_banner"
         android:allowBackup="false"
         android:usesCleartextTraffic="true"
         android:largeHeap="true"
