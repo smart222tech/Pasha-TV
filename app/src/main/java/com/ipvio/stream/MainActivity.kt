@@ -44,6 +44,13 @@ import com.ipvio.stream.data.Channel
 import com.ipvio.stream.data.RemoteChannelCatalog
 import kotlinx.coroutines.launch
 
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent { PashaLiteApp() }
+    }
+}
+
 private val builtInChannels = listOf(
     Channel("first", "Первый канал", "https://streaming.thestream.cyou/live/210-req_offset_28000000-req_window_0-1k_v5.m3u8", "Россия"),
     Channel("russia1", "Россия 1", "http://45.159.74.13:80/Rossia1/tracks-v1a1/mono.m3u8", "Россия"),
