@@ -238,6 +238,38 @@ object PlaylistStore {
         if (enc == null && lists.isNotEmpty()) persist(c)   // Übernahme der alten Klartext-Liste (nach dem Setzen von "active")
     }
 
+    /**
+     * Installs the app-owned PASHA catalog into the normal IPVIO data pipeline.
+     * It intentionally does not start the playlist importer or perform a network request.
+     */
+    fun installBuiltIn(c: Context, items: List<Item>) {
+        ensure(c)
+        lists.clear()
+        active = 0
+        multi = emptySet()
+        extras.clear()
+        clearPending(c)
+        persist(c)
+
+        val order = items.map { it.group }.distinct().withIndex().associate { it.value to it.index }
+        primaryItems = items
+        primaryUrl = "https://pasha-tv.invalid/builtin.m3u"
+        primaryEpg = emptyList()
+        primaryOrder = order
+        langCounts = items.groupingBy { it.lang }.eachCount()
+        langBytes = emptyMap()
+        shownHidden = emptySet()
+        epgUrls = emptyList()
+        catOrder = order
+        sourceNames = listOf("PASHA TV")
+        merged = MultiLogic.merge(listOf(items), sourceNames)
+        twins = emptyMap()
+        setItems(items)
+        loading = false
+        heavy = false
+        error = null
+    }
+
     /** Delete leftovers of aborted downloads older than two days (a raw file can be over 200 MB). */
     private fun cleanupStale(c: Context) {
         runCatching {
