@@ -97,7 +97,7 @@ fun SettingsHub(onAdd: () -> Unit, reload: () -> Unit) {
             // Round 15: in the style of the home screen (tiles with an own color per area, calm font, white focus)
             Column(verticalArrangement = Arrangement.spacedBy(dpx(4))) {
                 Text("Einstellungen", color = Color.White, fontSize = spx(38), fontWeight = FontWeight.ExtraBold)
-                Text("Alles rund um Aussehen, Wiedergabe und Konto", color = Tok.TextLow, fontSize = spx(16))
+                Text("Sender, Wiedergabe und Darstellung", color = Tok.TextLow, fontSize = spx(16))
             }
             val visibleCats = CATS.withIndex().filter { it.index in setOf(0, 1, 2, 3, 5, 6, 8, 18) }
             visibleCats.chunked(3).forEach { row ->
@@ -1292,7 +1292,6 @@ private fun ApiKeysPage(ctx: Context) {
 private fun AboutPage(ctx: Context) {
     Text("PASHA TV Lite · Version " + appVersion(ctx), color = Color.White, fontSize = 18.sp)
     Hint("PASHA TV Lite ist ein Player. Die Verfügbarkeit einzelner Sender hängt von den jeweiligen Stream-Quellen ab. Nutze nur Quellen, für die du eine Berechtigung hast.")
-    Hint("Dieses Produkt verwendet die TMDB-API, wird aber nicht von TMDB unterstützt oder zertifiziert. Wertungen: OMDb. Intro-Zeiten: TheIntroDB.")
     Hint("PASHA TV Lite ist freie Software unter der GNU General Public License v3 (GPL-3.0). Verwendete Bibliotheken: AndroidX/Jetpack Compose, Media3 (Apache 2.0), OkHttp, Coil (Apache 2.0), Jellyfin FFmpeg-Decoder (GPL-3.0), Schriften Outfit und Inter (SIL Open Font License).")
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         PillButton("Systemeinstellungen der App") {
@@ -1304,10 +1303,9 @@ private fun AboutPage(ctx: Context) {
             }
         }
     }
-    UpdateSection(ctx)
     SectionTitle("Zurücksetzen")
     ConfirmPill("Alle Einstellungen zurücksetzen") { AppSettings.resetAll(ctx); General.resetAll(ctx) }
-    Hint("Setzt Ansicht, Design, Menü, Player, Ton und Start auf die Standardwerte. Playlists, Favoriten, Verlauf und Fortsetzen-Positionen bleiben erhalten. Zwischenspeicher leerst du unter „Speicher“.")
+    Hint("Setzt die Darstellung und Wiedergabeoptionen zurück. Deine Favoriten und der zuletzt angesehene Sender bleiben erhalten.")
 }
 
 /** App update from within the app: the default is the latest release on GitHub. */
