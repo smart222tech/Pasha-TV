@@ -175,12 +175,15 @@ private val SE_RE = Regex("""S(\d+)E(\d+)""")
 private fun AppContent() {
     val ctx = LocalContext.current
     remember {
-        AppSettings.init(ctx); WatchStore.init(ctx); History.init(ctx); Library.init(ctx); QualityStore.init(ctx)
+        AppSettings.init(ctx)
+        // PASHA TV keeps the original IPVIO navigation, animation and player, but exposes only three areas.
+        AppSettings.menuOrder.clear(); AppSettings.menuOrder.addAll(listOf(3, MenuLogic.FAVS, MenuLogic.SETTINGS))
+        AppSettings.menuHidden.clear()
+        WatchStore.init(ctx); History.init(ctx); Library.init(ctx); QualityStore.init(ctx)
         PlaybackPrefs.init(ctx); DeadLinks.init(ctx); ChannelLists.init(ctx); Reminders.init(ctx); Reminders.schedule(ctx); 0
     }
-    // Interrupted in the middle of adding last time (crash, power loss): the add screen automatically continues loading
-    val resumeAdd = remember { PlaylistStore.pending(ctx)?.autoResume == true }
-    var adding by remember { mutableStateOf(PlaylistStore.savedUrl(ctx) == null || resumeAdd) }
+    // PASHA TV ships with its own channel catalog; playlist import is not part of this app.
+    var adding by remember { mutableStateOf(false) }
     // Top detail page (Item or PersonRef) plus back stack, so Back retraces Movie → Person → Movie
     var top by remember { mutableStateOf<Any?>(null) }
     val trail = remember { mutableStateListOf<Any>() }
@@ -191,7 +194,7 @@ private fun AppContent() {
     var browse by remember { mutableStateOf<BrowseState?>(null) }
     var cats by remember { mutableStateOf<CatReq?>(null) }
     var playing by remember { mutableStateOf<PlayReq?>(null) }
-    var tab by remember { mutableStateOf(SettingsLogic.resolveStartTab(General.startTab, AppSettings.menuOrder.toList(), AppSettings.menuHidden.toList())) }
+    var tab by remember { mutableStateOf(3) }
     val gridState = remember(browse) { LazyGridState() }
     val states = listOf(
         rememberLazyListState(), rememberLazyListState(), rememberLazyListState(),
@@ -207,31 +210,18 @@ private fun AppContent() {
 
     LaunchedEffect(Unit) {
         withContext(Dispatchers.IO) { General.cleanupLegacy(ctx) }
-        if (resumeAdd) return@LaunchedEffect
-        PlaylistStore.savedUrl(ctx)?.let { u ->
-            val skip = !SettingsLogic.refreshDue(General.plan(), General.lastRefresh, System.currentTimeMillis(), General.zone())
-            val ok = PlaylistStore.load(ctx, u, false, skip)
-            if (ok && !skip) General.markRefreshed(ctx)
-        }
+        PlaylistStore.installBuiltIn(ctx, PashaCatalog.channels)
+        General.resumeLive = true
     }
 
     // Back in the app after the Home key: to the home screen (a running playback and adding stay as they are)
     LaunchedEffect(AppNav.homeSignal) {
         if (AppNav.homeSignal > 0 && playing == null && !adding) {
-            val changed = top != null || browse != null || cats != null || tab != 0
+            val changed = top != null || browse != null || cats != null || tab != 3
             top = null; trail.clear(); browse = null; cats = null
-            if (changed) AppNav.focusTab = 0
-            if (tab != 0) { tab = 0; CatMemory.reset() }
+            if (changed) AppNav.focusTab = 3
+            if (tab != 3) { tab = 3; CatMemory.reset() }
         }
-    }
-
-    // Left the add screen without anything loaded (e.g. resuming cancelled): load the saved playlist
-    var wasAdding by remember { mutableStateOf(adding) }
-    LaunchedEffect(adding) {
-        if (wasAdding && !adding && PlaylistStore.channels.isEmpty() && !PlaylistStore.loading) {
-            PlaylistStore.savedUrl(ctx)?.let { PlaylistStore.load(ctx, it, false, true) }
-        }
-        wasAdding = adding
     }
 
     val all = PlaylistStore.channels
@@ -478,7 +468,7 @@ private fun AppContent() {
                 },
                 onBrowse = { browse = BrowseState(it) },
                 onCategories = { cats = it },
-                onAdd = { adding = true }
+                onAdd = { /* playlist import is intentionally disabled in PASHA TV */ }
             ) }
         }
         if (RemoteUi.show) RemoteOverlay(Modifier.align(Alignment.Center))
