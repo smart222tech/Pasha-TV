@@ -38,8 +38,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         // Load settings early so colors and size are right in the very first frame.
         Profiles.init(this)
-        val pick = Profiles.needsPicker(this)
-        if (!pick) AppSettings.init(this)
+        // PASHA TV Lite is a single-viewer TV app; never show the legacy profile picker.
+        Profiles.setAsk(this, false)
+        val pick = false
+        AppSettings.init(this)
         General.init(this)
         Boomer.init(this)
         HomeLayout.init(this); BoomerLayout.init(this)
