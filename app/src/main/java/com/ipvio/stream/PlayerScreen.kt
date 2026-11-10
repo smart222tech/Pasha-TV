@@ -1376,8 +1376,11 @@ fun PlayerScreen(req: PlayReq, zapList: List<Item>, liveAll: List<Item>, seriesI
                             PRoundButton(label = "Vorheriger Sender", enabled = zapSrc.size > 1, onLabel = setLabel, onClick = { zap(-1) }) {
                                 PlayerIcon(PIcon.PrevEp, it)
                             }
-                            PRoundButton(label = if (playing) "Pause" else "Abspielen", onLabel = setLabel, onClick = { togglePlay() }) {
-                                PlayerIcon(if (playing) PIcon.Pause else PIcon.Play, it)
+                            PRoundButton(label = "Abspielen", enabled = !playing, onLabel = setLabel, onClick = { player.play() }) {
+                                PlayerIcon(PIcon.Play, it)
+                            }
+                            PRoundButton(label = "Pause", enabled = playing, onLabel = setLabel, onClick = { player.pause() }) {
+                                PlayerIcon(PIcon.Pause, it)
                             }
                             PRoundButton(label = "Nächster Sender", enabled = zapSrc.size > 1, onLabel = setLabel, onClick = { zap(1) }) {
                                 PlayerIcon(PIcon.NextEp, it)
