@@ -311,4 +311,18 @@ nie¦никогда
 Kartengröße (Reihen)¦Размер карточек (ряды)
 Liste mit Vorschau¦Список с предпросмотром
 Kacheln¦Плитки
+Quelle {0}¦Источник {0}
+Wiedergabe: {0}¦Воспроизведение: {0}
+Staffel {0}¦Сезон {0}
+Folge {0}¦Серия {0}
+Vorherige Sendung: {0}¦Предыдущая передача: {0}
+Vorherige Folge: Staffel {0}, Folge {1}¦Предыдущая серия: сезон {0}, серия {1}
+Nächste Sendung: {0}¦Следующая передача: {0}
+Nächste Folge: Staffel {0}, Folge {1}¦Следующая серия: сезон {0}, серия {1}
+Schnell {0}¦Быстро {0}
+Sleep-Timer¦Таймер сна
+Intro¦Заставка
+Abspann¦Титры
+Fit¦Вписать
+Beim Markieren einer Auswahl zeigt die Vorschau sofort die Wirkung, OK übernimmt sie.¦При выборе параметра предпросмотр сразу показывает результат, OK применяет его.
 """.trimIndent()
