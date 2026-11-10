@@ -398,7 +398,7 @@ fun PlayerScreen(req: PlayReq, zapList: List<Item>, liveAll: List<Item>, seriesI
 
     /** Further sources of the running title: for a movie from the playlist, for series the sources of the episode. */
     fun currentAlts(): List<Variant> = when {
-        cur.live -> liveAlts
+        cur.live -> liveAlts.takeIf { it.isNotEmpty() } ?: PashaCatalog.variantsFor(cur.itemId)
         cur.alts.isNotEmpty() -> cur.alts
         cur.season > 0 || cur.episode > 0 -> epList.firstOrNull { it.season == cur.season && it.num == cur.episode }?.variants.orEmpty()
         else -> emptyList()
@@ -406,13 +406,15 @@ fun PlayerScreen(req: PlayReq, zapList: List<Item>, liveAll: List<Item>, seriesI
 
     /** Switch to another (preferably smaller) source – after an error or on stutter. true = switched. */
     fun switchSource(reason: String, sameFirst: Boolean = false): Boolean {
-        if (cur.live || !PlaybackPrefs.autoFallback) return false
+        if (!cur.live && !PlaybackPrefs.autoFallback) return false
         val alts = currentAlts()
         if (alts.size < 2) return false
         triedUrls.add(cur.url)
         val curI = alts.indexOfFirst { it.url == cur.url }.coerceAtLeast(0)
         val tried = alts.indices.filter { alts[it].url in triedUrls }.toSet()
-        val ni = QualityLogic.fallback(alts.map { it.quality }, curI, tried, sameFirst) ?: return false
+        val ni = if (cur.live) alts.indices.firstOrNull { it != curI && it !in tried }
+            else QualityLogic.fallback(alts.map { it.quality }, curI, tried, sameFirst)
+            ?: return false
         // 4K had to give way because of stutter/decoder: counts for the learned device limit (a dead link does not)
         if (!sameFirst && QualityLogic.rank(alts[curI].quality) >= 4 && QualityLogic.rank(alts[ni].quality) < 4) PlaybackPrefs.note4kTrouble(ctx)
         val at = player.currentPosition.coerceAtLeast(0L)
@@ -651,10 +653,14 @@ fun PlayerScreen(req: PlayReq, zapList: List<Item>, liveAll: List<Item>, seriesI
                 if (player.playbackState == Player.STATE_BUFFERING && player.playWhenReady && !pError) {
                     if (bufSince == 0L) bufSince = nowT
                     else if (nowT - bufSince > (if (cur.live) 15_000L else 30_000L) && (cur.live || wdTries < 2)) {
-                        // Live: reconnect without limit (like a receiver), movie/series: twice
                         wdTries++; bufSince = nowT
-                        msg = if (cur.live) "Verbindung hängt – neuer Versuch ($wdTries)" else "Verbindung hängt – neuer Versuch ($wdTries/2)"
-                        if (cur.live && cur.archive == null) LiveTimeshift.reconnect(player) else player.prepare()
+                        if (cur.live && cur.archive == null) {
+                            msg = "Keine Daten – prüfe nächste Quelle …"
+                            if (!switchSource("Quelle antwortet nicht")) LiveTimeshift.reconnect(player)
+                        } else {
+                            msg = "Verbindung hängt – neuer Versuch ($wdTries/2)"
+                            player.prepare()
+                        }
                     }
                 } else {
                     bufSince = 0L
@@ -703,7 +709,7 @@ fun PlayerScreen(req: PlayReq, zapList: List<Item>, liveAll: List<Item>, seriesI
                 // and keep playing (picture and position stay). Never discard the whole source just because the audio fails.
                 if (decoder && audioFallback()) return
                 val liveNow = cur.live && cur.archive == null
-                if (retries < (if (liveNow) 50 else 3) && !isPermanentHttp(status) && !decoder) {
+                if (retries < 2 && !isPermanentHttp(status) && !decoder) {
                     retries++
                     msg = if (liveNow) "Verbindung unterbrochen – neuer Versuch ($retries)" else "Verbindung unterbrochen – neuer Versuch ($retries/3)"
                     // Live: keep trying with a growing pause (at most 15 s), and back to the live picture
@@ -1361,22 +1367,22 @@ fun PlayerScreen(req: PlayReq, zapList: List<Item>, liveAll: List<Item>, seriesI
                             },
                             horizontalArrangement = Arrangement.spacedBy(PT.BtnGap), verticalAlignment = Alignment.CenterVertically
                         ) {
-                            PRoundButton(Modifier.focusRequester(liveFirst), label = "Список каналов", onLabel = setLabel, onClick = { openChannels() }) {
+                            PRoundButton(Modifier.focusRequester(liveFirst), label = "Senderliste", onLabel = setLabel, onClick = { openChannels() }) {
                                 PlayerIcon(PIcon.Channels, it)
                             }
-                            PRoundButton(label = "Категории каналов", onLabel = setLabel, onClick = { openCategories() }) {
+                            PRoundButton(label = "Kategorien", onLabel = setLabel, onClick = { openCategories() }) {
                                 PlayerIcon(PIcon.Guide, it)
                             }
-                            PRoundButton(label = "Предыдущий канал", enabled = zapSrc.size > 1, onLabel = setLabel, onClick = { zap(-1) }) {
+                            PRoundButton(label = "Vorheriger Sender", enabled = zapSrc.size > 1, onLabel = setLabel, onClick = { zap(-1) }) {
                                 PlayerIcon(PIcon.PrevEp, it)
                             }
-                            PRoundButton(label = if (playing) "Пауза" else "Воспроизвести", onLabel = setLabel, onClick = { togglePlay() }) {
+                            PRoundButton(label = if (playing) "Pause" else "Abspielen", onLabel = setLabel, onClick = { togglePlay() }) {
                                 PlayerIcon(if (playing) PIcon.Pause else PIcon.Play, it)
                             }
-                            PRoundButton(label = "Следующий канал", enabled = zapSrc.size > 1, onLabel = setLabel, onClick = { zap(1) }) {
+                            PRoundButton(label = "Nächster Sender", enabled = zapSrc.size > 1, onLabel = setLabel, onClick = { zap(1) }) {
                                 PlayerIcon(PIcon.NextEp, it)
                             }
-                            PRoundButton(Modifier.focusRequester(btn.getValue(Panel.MENU)), label = "Настройки плеера", onLabel = setLabel, onClick = { openPanel(Panel.MENU) }) {
+                            PRoundButton(Modifier.focusRequester(btn.getValue(Panel.MENU)), label = "Einstellungen", onLabel = setLabel, onClick = { openPanel(Panel.MENU) }) {
                                 PlayerIcon(PIcon.Settings, it)
                             }
                         }
