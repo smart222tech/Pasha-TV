@@ -325,4 +325,9 @@ Intro¦Заставка
 Abspann¦Титри
 Fit¦Вписати
 Beim Markieren einer Auswahl zeigt die Vorschau sofort die Wirkung, OK übernimmt sie.¦Під час вибору параметра попередній перегляд одразу показує результат, OK застосовує його.
+Tonspur „{0}“ ist mit diesem Ausgang nicht abspielbar – andere Spur im Menü wählen¦Аудіодоріжка «{0}» не підтримується цим виходом — виберіть іншу доріжку в меню
+Continue watching¦Продовжити перегляд
+Play again¦Переглянути знову
+Previous/Next show¦Попередня/наступна передача
+Next¦Далі
 """.trimIndent()
