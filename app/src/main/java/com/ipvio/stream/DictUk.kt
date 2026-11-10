@@ -238,4 +238,39 @@ Automatische Genres¦Автоматичні жанри
 Filme¦Фільми
 Serien¦Серіали
 Live-TV¦ТБ
+Versucht PASHA TV Lite beim Start des Fernsehers oder der Box automatisch zu öffnen. Die Verfügbarkeit hängt von Android bzw. Fire OS ab.¦Намагається автоматично відкрити PASHA TV Lite під час запуску телевізора або приставки. Доступність залежить від Android або Fire OS.
+Für den Autostart fehlt möglicherweise die Berechtigung „Über anderen Apps einblenden“. Fire OS kann diese Funktion einschränken.¦Для автозапуску може знадобитися дозвіл «Поверх інших програм». Fire OS може обмежувати цю функцію.
+Die Oberfläche ist für TV-Bildschirme optimiert. Im Player bleiben die Touch-Steuerungen verfügbar.¦Інтерфейс оптимізовано для телевізорів. У плеєрі залишаються сенсорні елементи керування.
+Dieses Gerät bietet die Einstellung nicht an. Autostart funktioniert evtl. trotzdem.¦На цьому пристрої такого налаштування немає. Автозапуск усе одно може працювати.
+Prüfen¦Перевірити
+Berechtigung erteilt. Der Autostart ist bereit.¦Дозвіл надано. Автозапуск готовий.
+Berechtigung fehlt noch. Bitte „Einstellung öffnen“ wählen und PASHA TV Lite erlauben.¦Дозвіл ще не надано. Виберіть «Відкрити налаштування» та дозвольте PASHA TV Lite.
+Ein Klick stellt Farbe und Hintergrund passend ein. Darunter kannst du alles weiter von Hand ändern.¦Одне натискання підбирає відповідні кольори та тло. Нижче все можна змінити вручну.
+Farbe 2 ist auf diesem Hintergrund schwer lesbar.¦Колір 2 погано читається на цьому тлі.
+Standard ist 85 %: mehr Inhalt, Elemente bleiben gut lesbar. „Automatisch“ vergrößert die App auf sehr breiten Bildschirmen.¦За замовчуванням 85%: більше вмісту, елементи залишаються читабельними. «Автоматично» збільшує застосунок на дуже широких екранах.
+Animationen „Aus“ schaltet die Vergrößerung beim Fokus ab, „Dezent“ macht sie schwächer. Das schont schwache Geräte.¦Анімація «Вимк.» вимикає збільшення під час фокуса, «Непомітно» послаблює його. Це зменшує навантаження на слабкі пристрої.
+Zeigt einen Rahmen mit vier Ecken am Fernseher: Stelle den Rand ein, bis alle vier Ecken sichtbar sind. Hilft, wenn dein Fernseher Menü oder Texte am Rand abschneidet.¦Показує рамку з чотирма кутами. Налаштуйте краї так, щоб було видно всі кути. Допомагає, якщо телевізор обрізає меню або текст по краях.
+Outfit (Standard) und Inter sind in die App eingebaut, die übrigen Schriften stammen von deinem Gerät.¦Outfit (за замовчуванням) та Inter вбудовані в застосунок, інші шрифти беруться з пристрою.
+Fünf klare Systemschriften, die auf jedem Gerät vorhanden sind. Die Schriftgröße wirkt zusätzlich zur Anzeigegröße.¦П’ять чітких системних шрифтів, доступних на будь-якому пристрої. Розмір шрифту застосовується додатково до масштабу інтерфейсу.
+Zeigt kurz Auflösung, Ton und Format beim Abspielen von Filmen und Serien.¦Коротко показує роздільну здатність, звук і формат під час відтворення фільмів і серіалів.
+Zeigt, um wie viel Uhr der Film voraussichtlich endet.¦Показує орієнтовний час завершення фільму.
+Zeigt bei Serien einen Knopf „Intro überspringen“, wenn Intro-Zeiten bekannt sind.¦Показує кнопку «Пропустити заставку» в серіалах, якщо відома тривалість заставки.
+Überspringt bekannte Intros ohne Rückfrage.¦Автоматично пропускає відомі заставки.
+Startet die nächste Folge nach dem Abspann von selbst.¦Автоматично запускає наступну серію після титрів.
+Startet die nächste Folge, sobald der Abspann beginnt. Geht nur, wenn für die Serie Abspann-Zeiten bekannt sind (TheIntroDB); sonst bleibt es beim Hinweis in den letzten 30 Sekunden.¦Запускає наступну серію одразу після початку титрів. Працює, лише якщо час титрів відомий із TheIntroDB; інакше підказка з’явиться за останні 30 секунд.
+Uhrzeit: Schrift-Deckkraft¦Прозорість цифр годинника
+Passt die Bildwiederholrate des Fernsehers an den Film an (z. B. 24 Bilder), wenn der Fernseher das ohne Bildaussetzer kann. Bei Fire TV zusätzlich in den Geräteeinstellungen „Originale Bildrate anpassen“ prüfen.¦Підлаштовує частоту оновлення телевізора під фільм (наприклад, 24 кадри), якщо телевізор підтримує це без зникнення зображення. На Fire TV також перевірте «Підлаштовувати оригінальну частоту кадрів» у налаштуваннях пристрою.
+Intro-Zeiten stammen aus der Community-Datenbank TheIntroDB und gibt es nicht für jede Serie. Die Stream-Info erscheint nur bei Filmen und Serien.¦Час заставок береться з бази спільноти TheIntroDB і доступний не для всіх серіалів. Інформація про потік відображається лише для фільмів і серіалів.
+Gilt für Bild-in-Bild. Deine Auswahl wird gespeichert.¦Застосовується до режиму «картинка в картинці». Вибір зберігається.
+Rand: „Schatten“ legt einen weichen dunklen Schatten unter die Schrift, „Kontur“ zeichnet einen schwarzen Rand rundherum (besser lesbar auf hellem Bild), „Kein“ lässt die Schrift pur.¦Контур: «Тінь» додає м’яку темну тінь, «Контур» малює чорну межу навколо тексту (краще читається на світлому зображенні), «Немає» залишає звичайний текст.
+TV-Programm (EPG)¦Телепрограма (EPG)
+Sender-Qualitäten bündeln¦Об’єднувати варіанти якості каналів
+Derselbe Sender in 8K, 4K, FHD, HD und SD erscheint als eine Zeile. OK startet die beste Qualität, die anderen wählst du im Menü des Senders (OK gedrückt halten).¦Один канал у 8K, 4K, FHD, HD та SD відображається одним рядком. OK запускає найкращу якість, інші варіанти можна вибрати в меню каналу (утримуйте OK).
+Die App sucht die Programmdaten automatisch (Xtream-Schnittstelle oder XMLTV-Adresse aus der Playlist). Wenn dein Anbieter eine eigene XMLTV-Adresse nennt, trage sie hier ein.¦Застосунок автоматично шукає дані телепрограми (через Xtream або XMLTV-адресу з плейлиста). Якщо провайдер надав окрему XMLTV-адресу, введіть її тут.
+Speichern & laden¦Зберегти й завантажити
+Neu laden¦Завантажити знову
+Sender als Favorit: auf dem Sender OK gedrückt halten > „Zu Favoriten“. Kategorie als Favorit: auf der Kategorie OK gedrückt halten.¦Щоб додати канал до обраного, утримуйте OK на каналі та виберіть «До обраного». Для категорії утримуйте OK на ній.
+PASHA TV Lite ist ein Player. Die Verfügbarkeit einzelner Sender hängt von den jeweiligen Stream-Quellen ab. Nutze nur Quellen, für die du eine Berechtigung hast.¦PASHA TV Lite — це плеєр. Доступність каналів залежить від джерел трансляції. Використовуйте лише джерела, до яких маєте дозвіл на доступ.
+Systemeinstellungen der App¦Системні налаштування застосунку
+Setzt die Darstellung und Wiedergabeoptionen zurück. Deine Favoriten und der zuletzt angesehene Sender bleiben erhalten.¦Скидає налаштування зображення та відтворення. Обране й останній переглянутий канал зберігаються.
 """.trimIndent()
