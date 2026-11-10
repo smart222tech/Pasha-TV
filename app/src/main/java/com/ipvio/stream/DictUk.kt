@@ -79,4 +79,6 @@ Kein Programm verfügbar¦Телепрограма недоступна
 Zurück zu Live¦Повернутися до прямого ефіру
 Quelle gestört¦Джерело не працює
 Quelle antwortet nicht¦Джерело не відповідає
+Pause¦Пауза
+Quelle¦Джерело
 """.trimIndent()
