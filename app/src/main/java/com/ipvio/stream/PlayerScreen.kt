@@ -421,7 +421,7 @@ fun PlayerScreen(req: PlayReq, zapList: List<Item>, liveAll: List<Item>, seriesI
         val t = alts[ni]
         stalls = emptyList()
         cur = cur.copy(url = t.url, startMs = if (at > 0) at else cur.startMs, note = null)
-        notice = reason + " – wechsle auf " + (t.quality ?: "andere Quelle")
+        notice = Lang.tr(reason) + " · " + Lang.tr("Quelle") + " " + (t.quality ?: "SD")
         return true
     }
 
@@ -655,7 +655,7 @@ fun PlayerScreen(req: PlayReq, zapList: List<Item>, liveAll: List<Item>, seriesI
                     else if (nowT - bufSince > (if (cur.live) 15_000L else 30_000L) && (cur.live || wdTries < 2)) {
                         wdTries++; bufSince = nowT
                         if (cur.live && cur.archive == null) {
-                            msg = "Keine Daten – prüfe nächste Quelle …"
+                            msg = Lang.tr("Quelle antwortet nicht")
                             if (!switchSource("Quelle antwortet nicht")) LiveTimeshift.reconnect(player)
                         } else {
                             msg = "Verbindung hängt – neuer Versuch ($wdTries/2)"
