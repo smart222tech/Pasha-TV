@@ -134,4 +134,10 @@ PASHA TV Lite startet automatisch mit dem zuletzt angesehenen Sender. Beim erste
 Gerätestart¦Device startup
 Auf der TV-Startseite muss Zurück zweimal gedrückt werden, damit die App nicht versehentlich geschlossen wird.¦On the TV home screen, press Back twice to avoid closing the app accidentally.
 Live-TV¦Live TV
+Versucht PASHA TV Lite beim Start des Fernsehers oder der Box automatisch zu öffnen. Die Verfügbarkeit hängt von Android bzw. Fire OS ab.¦Tries to open PASHA TV Lite automatically when the TV or box starts. Availability depends on Android or Fire OS.
+Für den Autostart fehlt möglicherweise die Berechtigung „Über anderen Apps einblenden“. Fire OS kann diese Funktion einschränken.¦Auto-start may require the “Display over other apps” permission. Fire OS may restrict this feature.
+Die Oberfläche ist für TV-Bildschirme optimiert. Im Player bleiben die Touch-Steuerungen verfügbar.¦The interface is optimized for TV screens. Touch controls remain available in the player.
+Berechtigung fehlt noch. Bitte „Einstellung öffnen“ wählen und PASHA TV Lite erlauben.¦Permission is still missing. Select “Open settings” and allow PASHA TV Lite.
+PASHA TV Lite ist ein Player. Die Verfügbarkeit einzelner Sender hängt von den jeweiligen Stream-Quellen ab. Nutze nur Quellen, für die du eine Berechtigung hast.¦PASHA TV Lite is a player. Channel availability depends on the respective stream sources. Use only sources you are authorized to access.
+Setzt die Darstellung und Wiedergabeoptionen zurück. Deine Favoriten und der zuletzt angesehene Sender bleiben erhalten.¦Resets display and playback options. Your favorites and last watched channel are kept.
 """
