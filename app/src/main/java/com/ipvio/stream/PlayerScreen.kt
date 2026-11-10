@@ -179,7 +179,7 @@ fun PlayerScreen(req: PlayReq, zapList: List<Item>, liveAll: List<Item>, seriesI
     var buffering by remember { mutableStateOf(true) }
     var playing by remember { mutableStateOf(true) }
     // Live (round 14): open straight with the control bar showing channel and show instead of the short info box
-    var controls by remember { mutableStateOf(true) }
+    var controls by remember { mutableStateOf(false) }
     var focusSeek by remember { mutableStateOf(false) }
     var panel by remember { mutableStateOf(Panel.NONE) }
     // Technical info and subtitle search (OpenSubtitles)
@@ -304,6 +304,7 @@ fun PlayerScreen(req: PlayReq, zapList: List<Item>, liveAll: List<Item>, seriesI
     fun ping() { miniBar = true; miniTick++ }
 
     fun openChannels() { focusedCh = curItem; showCats = false; chanCat = playCat; showChannels = true }
+    fun openCategories() { focusedCh = curItem; showCats = true; chanCat = playCat; showChannels = true }
 
     fun togglePlay() { if (player.isPlaying) player.pause() else player.play() }
 
@@ -1073,7 +1074,7 @@ fun PlayerScreen(req: PlayReq, zapList: List<Item>, liveAll: List<Item>, seriesI
                             val seg = activeSeg
                             if (showNextCard) { playEpisode(epList[epIdx + 1]); true }
                             else if (seg != null && segVisible) { skipSeg(seg); true }
-                            else if (cur.live) { controls = true; true }
+                            else if (cur.live) { openChannels(); true }
                             // Like YouTube, Netflix & co.: during/shortly after seeking, OK confirms the target position and keeps playing
                             // instead of pausing (that happened because one wants to "confirm" the seek).
                             else if (scrubTarget >= 0) {
@@ -1354,95 +1355,29 @@ fun PlayerScreen(req: PlayReq, zapList: List<Item>, liveAll: List<Item>, seriesI
                     if (cur.live) {
                         LiveInfoBlock(curItem, cur.title, if (curIdx >= 0) curIdx + 1 else 0, epg)
                         Spacer(Modifier.height(20.dp))
-                        val fav = Library.isFav(cur.itemId)
                         Row(
                             Modifier.horizontalScroll(rememberScrollState()).onPreviewKeyEvent { e ->
                                 if (e.type == KeyEventType.KeyDown && e.key == Key.DirectionDown) { controls = false; true } else false
                             },
                             horizontalArrangement = Arrangement.spacedBy(PT.BtnGap), verticalAlignment = Alignment.CenterVertically
                         ) {
-                            PRoundButton(Modifier.focusRequester(liveFirst), label = "Senderliste", onLabel = setLabel, onClick = { openChannels() }) {
+                            PRoundButton(Modifier.focusRequester(liveFirst), label = "Список каналов", onLabel = setLabel, onClick = { openChannels() }) {
                                 PlayerIcon(PIcon.Channels, it)
                             }
-                            PRoundButton(label = "TV-Guide", onLabel = setLabel, onClick = { controls = false; showGuide = true }) {
+                            PRoundButton(label = "Категории каналов", onLabel = setLabel, onClick = { openCategories() }) {
                                 PlayerIcon(PIcon.Guide, it)
                             }
-                            PRoundButton(label = "Zurück zu Live", onLabel = setLabel, onClick = {
-                                if (LiveTimeshift.active) LiveTimeshift.goLive(player)
-                                else if (player.isCurrentMediaItemSeekable) player.seekToDefaultPosition()
-                                else { player.stop(); player.prepare() }
-                                player.play()
-                                behindSec = 0L
-                                controls = false
-                                flash = Flash(PIcon.Play, "LIVE")
-                            }) {
-                                PlayerIcon(PIcon.Play, it)
+                            PRoundButton(label = "Предыдущий канал", enabled = zapSrc.size > 1, onLabel = setLabel, onClick = { zap(-1) }) {
+                                PlayerIcon(PIcon.PrevEp, it)
                             }
-                            // Live buffer: 30 s back (the remote's seek keys jump by the step size)
-                            if (LiveTimeshift.active) {
-                                PRoundButton(label = "30 s zurück", onLabel = setLabel, onClick = {
-                                    LiveTimeshift.seekBy(player, -30_000L); flash = Flash(PIcon.Replay, "−30 s")
-                                }) { PlayerIcon(PIcon.Replay, it) }
+                            PRoundButton(label = if (playing) "Пауза" else "Воспроизвести", onLabel = setLabel, onClick = { togglePlay() }) {
+                                PlayerIcon(if (playing) PIcon.Pause else PIcon.Play, it)
                             }
-                            // Recording of the running show (from the buffer, without a second connection)
-                            if (cur.archive == null && TapLogic.tappable(resolvedUrl.ifEmpty { cur.url })) {
-                                val recOn = Recorder.isRecording(cur.itemId)
-                                PRoundButton(label = if (recOn) "Aufnahme beenden" else "Aufnehmen", onLabel = setLabel, onClick = {
-                                    val ch = curItem
-                                    if (ch == null) flash = Flash(null, "Sender unbekannt")
-                                    else if (recOn) { Recorder.stopFor(ctx, ch.id); flash = Flash(null, "Aufnahme beendet") }
-                                    else {
-                                        val ok = LiveTimeshift.active || LiveTimeshift.start(ctx, player, resolvedUrl.ifEmpty { cur.url })
-                                        val t = LiveTimeshift.tap
-                                        val r = if (ok && t != null) Recorder.start(ctx, ch, Epg.current(epg), t) else null
-                                        flash = Flash(null, if (r != null) "Aufnahme gestartet" else "Zu wenig freier Speicher")
-                                    }
-                                }) { c -> Box(Modifier.size(20.dp).clip(CircleShape).background(if (recOn) Color(0xFFFF3B30) else c)) }
+                            PRoundButton(label = "Следующий канал", enabled = zapSrc.size > 1, onLabel = setLabel, onClick = { zap(1) }) {
+                                PlayerIcon(PIcon.NextEp, it)
                             }
-                            if (Catchup.has(curItem)) {
-                                PRoundButton(label = "Von Anfang an", onLabel = setLabel, onClick = {
-                                    val ch = curItem
-                                    val e = Epg.current(epg)
-                                    if (ch != null && e != null) playArchive(ch, e) else flash = Flash(null, "Kein Programm bekannt")
-                                }) { AppIcon(AIcon.Catchup, it, size = 26.dp) }
-                                PRoundButton(Modifier.focusRequester(btn.getValue(Panel.ARCHIVE)), label = "Archiv: verpasste Sendungen", onLabel = setLabel, onClick = { openPanel(Panel.ARCHIVE) }) {
-                                    AppIcon(AIcon.History, it, size = 26.dp)
-                                }
-                            }
-                            // With own channel lists: choose where to (favorites or an own list); otherwise toggle favorite directly
-                            Box {
-                                var favMenu by remember { mutableStateOf(false) }
-                                PRoundButton(
-                                    label = if (ChannelLists.lists.isNotEmpty()) "Favoriten & Listen" else if (fav) "Aus Favoriten entfernen" else "Zu Favoriten hinzufügen", onLabel = setLabel,
-                                    onClick = { if (ChannelLists.lists.isNotEmpty() && curItem != null) favMenu = true else Library.toggleFav(ctx, cur.itemId) }
-                                ) { c -> PlayerIcon(if (fav) PIcon.StarOn else PIcon.StarOff, if (fav && c == Color.White) PT.Gold else c) }
-                                val ci = curItem
-                                if (favMenu && ci != null) ChannelMenu(ci, null, null) { favMenu = false }
-                            }
-                            PRoundButton(Modifier.focusRequester(btn.getValue(Panel.TRACKS)), label = "Audio & Untertitel", onLabel = setLabel, onClick = { openPanel(Panel.TRACKS) }) {
-                                PlayerIcon(PIcon.AudioSubs, it)
-                            }
-                            PRoundButton(Modifier.focusRequester(btn.getValue(Panel.ASPECT)), label = "Bildformat", onLabel = setLabel, onClick = { openPanel(Panel.ASPECT) }) {
-                                PlayerIcon(PIcon.Aspect, it)
-                            }
-                            // Second stream (round 22): without a second picture channel selection, otherwise the menu with arrangement, audio and swap
-                            PRoundButton(label = "Zusatzbild", onLabel = setLabel, onClick = {
-                                if (second == null) { pickSecond = true; controls = false; openChannels() } else openPanel(Panel.MENU)
-                            }) {
-                                AppIcon(AIcon.Layers, it, size = 26.dp)
-                            }
-                            // Live channel with several qualities: pick the stream (4K / Full HD / HD / SD)
-                            if (cur.live && liveAlts.size > 1) PRoundButton(label = "Qualität", onLabel = setLabel, onClick = { openPanel(Panel.QUALITY) }) {
-                                AppIcon(AIcon.Sliders, it, size = 26.dp)
-                            }
-                            if (SportAlerts.miniOn || SportAlerts.pinned.isNotEmpty()) PRoundButton(label = "Score-Overlay", onLabel = setLabel, onClick = { scoreDlg = true }) {
-                                AppIcon(AIcon.Live, it, size = 26.dp)
-                            }
-                            PRoundButton(Modifier.focusRequester(btn.getValue(Panel.MENU)), label = "Einstellungen", onLabel = setLabel, onClick = { openPanel(Panel.MENU) }) {
+                            PRoundButton(Modifier.focusRequester(btn.getValue(Panel.MENU)), label = "Настройки плеера", onLabel = setLabel, onClick = { openPanel(Panel.MENU) }) {
                                 PlayerIcon(PIcon.Settings, it)
-                            }
-                            PRoundButton(label = "Extern öffnen", onLabel = setLabel, onClick = { player.pause(); openExternal(ctx, cur.url, cur.title) }) {
-                                PlayerIcon(PIcon.External, it)
                             }
                         }
                         Row(
