@@ -277,4 +277,38 @@ Systemzeit (Gerät: {0})¦Системний час (пристрій: {0})
 Uhrzeit jetzt: {0}¦Поточний час: {0}
 Version {0}¦Версія {0}
 Die Uhr folgt der Zeitzone und dem 12/24-Stunden-Format aus den Einstellungen. Im Player geht es auch über Einstellungen > Uhrzeit.¦Годинник використовує часовий пояс і 12/24-годинний формат із налаштувань. У плеєрі: Налаштування > Годинник.
+View¦Вигляд
+Karten¦Картки
+Seitenleiste¦Бічна панель
+Raster¦Сітка
+Startseite¦Головна сторінка
+Karten: So sehen einzelne Filme und Serien in den Listen aus (Poster oder breites Bild, Größe, Infos).¦Картки: як фільми й серіали відображаються у списках (постер або широке зображення, розмір, відомості).
+Seitenleiste: Das Menü am Rand mit Startseite, Filme, Serien und Live TV. Du kannst sie links, rechts oder oben anzeigen.¦Бічна панель: меню з головною сторінкою, фільмами, серіалами й ТБ. Її можна розмістити ліворуч, праворуч або вгорі.
+Raster: Wie viele Spalten und Zeilen die Rasteransicht (zum Beispiel „Alle Filme“) zeigt.¦Сітка: скільки стовпців і рядків показувати в режимі сітки (наприклад, «Усі фільми»).
+Startseite: Aussehen der ersten Seite nach dem Start. Welche Reihen erscheinen, stellst du über „Startseite anpassen“ ein.¦Головна сторінка: вигляд першого екрана після запуску. Набір рядів налаштовується в розділі «Налаштувати головну сторінку».
+Kategorien: Die Ordner deines Anbieters oder automatische Genres und ihre Darstellung.¦Категорії: папки провайдера або автоматичні жанри та їх відображення.
+Live-Vorschau starten¦Запустити попередній перегляд
+Zeigt die echte App mit deinen Titeln; die Einstellungen erscheinen in einer schmalen Leiste unten. Ein Klick auf eine Auswahl wirkt sofort.¦Показує застосунок із вашими матеріалами; налаштування відображаються у вузькій панелі знизу. Зміни застосовуються одразу.
+Kartengröße¦Розмір карток
+Bilder bei Filmen und Serien¦Зображення фільмів і серіалів
+Cover¦Постер
+Szenenbild¦Кадр із фільму
+Vorschau beim Markieren¦Попередній перегляд під час вибору
+Infos auf dem Poster¦Інформація на постері
+Breites Szenenbild¦Широкий кадр
+Standard-Ansicht¦Вигляд за замовчуванням
+Kino¦Кіно
+Raster zeigt viele Titel auf einmal. Kino zeigt oben die Details zum markierten Titel und unten eine Reihe zum Durchblättern.¦Сітка показує багато матеріалів одночасно. У режимі «Кіно» зверху відображаються відомості про вибраний матеріал, а знизу — ряд для перегляду.
+Beim Markieren einer Auswahl zeigt die Vorschau sofort die Wirkung, OK übernimmt sie. Schriftgröße und Farben findest du unter „Design“.¦Під час вибору параметра попередній перегляд одразу показує результат, OK застосовує його. Розмір шрифту та кольори — у розділі «Дизайн».
+Immer mit Text¦Завжди показувати текст
+Aus: nur Symbole, die Texte erscheinen beim Hineingehen. An: Symbole und Texte sind immer zu sehen (braucht mehr Platz).¦Вимк.: лише значки, текст з’являється під час відкриття. Увімк.: значки й текст видно завжди (потребує більше місця).
+Zurück bringt dich jederzeit in die Seitenleiste – auch wenn sie rechts oder oben steht.¦Кнопка «Назад» завжди повертає до бічної панелі, навіть якщо вона розташована праворуч або вгорі.
+Spalten (Raster)¦Стовпці (сітка)
+Zeilen (Raster)¦Рядки (сітка)
+Das Raster kannst du zusätzlich direkt in der Rasteransicht mit dem Raster-Knopf ändern.¦Кількість елементів у сітці можна також змінювати безпосередньо в режимі сітки кнопкою сітки.
+Banner wechselt¦Зміна банера
+nie¦ніколи
+Kartengröße (Reihen)¦Розмір карток (ряди)
+Liste mit Vorschau¦Список із попереднім переглядом
+Kacheln¦Плитки
 """.trimIndent()
