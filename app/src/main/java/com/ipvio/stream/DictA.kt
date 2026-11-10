@@ -113,4 +113,5 @@ Zwischengespeicherte Cover und Hintergründe¦Cached covers and backgrounds¦Ön
 Vorheriger Sender¦Previous channel
 Nächster Sender¦Next channel
 Quelle¦Source
+Sender, Wiedergabe und Darstellung¦Channels, playback and display
 """
