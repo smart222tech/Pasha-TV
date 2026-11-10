@@ -277,4 +277,38 @@ Systemzeit (Gerät: {0})¦Системное время (устройство: {
 Uhrzeit jetzt: {0}¦Текущее время: {0}
 Version {0}¦Версия {0}
 Die Uhr folgt der Zeitzone und dem 12/24-Stunden-Format aus den Einstellungen. Im Player geht es auch über Einstellungen > Uhrzeit.¦Часы используют часовой пояс и 12/24-часовой формат из настроек. В плеере: Настройки > Часы.
+View¦Вид
+Karten¦Карточки
+Seitenleiste¦Боковая панель
+Raster¦Сетка
+Startseite¦Главная страница
+Karten: So sehen einzelne Filme und Serien in den Listen aus (Poster oder breites Bild, Größe, Infos).¦Карточки: как фильмы и сериалы отображаются в списках (постер или широкое изображение, размер, сведения).
+Seitenleiste: Das Menü am Rand mit Startseite, Filme, Serien und Live TV. Du kannst sie links, rechts oder oben anzeigen.¦Боковая панель: меню с главной страницей, фильмами, сериалами и ТВ. Её можно разместить слева, справа или сверху.
+Raster: Wie viele Spalten und Zeilen die Rasteransicht (zum Beispiel „Alle Filme“) zeigt.¦Сетка: сколько столбцов и строк показывать в сеточном режиме (например, «Все фильмы»).
+Startseite: Aussehen der ersten Seite nach dem Start. Welche Reihen erscheinen, stellst du über „Startseite anpassen“ ein.¦Главная страница: вид первого экрана после запуска. Набор рядов настраивается в разделе «Настроить главную страницу».
+Kategorien: Die Ordner deines Anbieters oder automatische Genres und ihre Darstellung.¦Категории: папки провайдера или автоматические жанры и их отображение.
+Live-Vorschau starten¦Запустить предпросмотр
+Zeigt die echte App mit deinen Titeln; die Einstellungen erscheinen in einer schmalen Leiste unten. Ein Klick auf eine Auswahl wirkt sofort.¦Показывает приложение с вашими материалами; настройки отображаются в узкой панели снизу. Изменения применяются сразу.
+Kartengröße¦Размер карточек
+Bilder bei Filmen und Serien¦Изображения фильмов и сериалов
+Cover¦Постер
+Szenenbild¦Кадр из фильма
+Vorschau beim Markieren¦Предпросмотр при выборе
+Infos auf dem Poster¦Информация на постере
+Breites Szenenbild¦Широкий кадр
+Standard-Ansicht¦Вид по умолчанию
+Kino¦Кино
+Raster zeigt viele Titel auf einmal. Kino zeigt oben die Details zum markierten Titel und unten eine Reihe zum Durchblättern.¦Сетка показывает сразу много материалов. В режиме «Кино» сверху отображаются сведения о выбранном материале, а снизу — ряд для просмотра.
+Beim Markieren einer Auswahl zeigt die Vorschau sofort die Wirkung, OK übernimmt sie. Schriftgröße und Farben findest du unter „Design“.¦При выборе параметра предпросмотр сразу показывает результат, OK применяет его. Размер шрифта и цвета находятся в разделе «Дизайн».
+Immer mit Text¦Всегда показывать текст
+Aus: nur Symbole, die Texte erscheinen beim Hineingehen. An: Symbole und Texte sind immer zu sehen (braucht mehr Platz).¦Выкл.: только значки, текст появляется при открытии. Вкл.: значки и текст видны всегда (занимает больше места).
+Zurück bringt dich jederzeit in die Seitenleiste – auch wenn sie rechts oder oben steht.¦Кнопка «Назад» всегда возвращает к боковой панели, даже если она расположена справа или сверху.
+Spalten (Raster)¦Столбцы (сетка)
+Zeilen (Raster)¦Строки (сетка)
+Das Raster kannst du zusätzlich direkt in der Rasteransicht mit dem Raster-Knopf ändern.¦Количество элементов в сетке можно также менять прямо в режиме сетки кнопкой сетки.
+Banner wechselt¦Смена баннера
+nie¦никогда
+Kartengröße (Reihen)¦Размер карточек (ряды)
+Liste mit Vorschau¦Список с предпросмотром
+Kacheln¦Плитки
 """.trimIndent()
