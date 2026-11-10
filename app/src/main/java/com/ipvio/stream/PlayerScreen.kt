@@ -412,9 +412,9 @@ fun PlayerScreen(req: PlayReq, zapList: List<Item>, liveAll: List<Item>, seriesI
         triedUrls.add(cur.url)
         val curI = alts.indexOfFirst { it.url == cur.url }.coerceAtLeast(0)
         val tried = alts.indices.filter { alts[it].url in triedUrls }.toSet()
-        val ni = if (cur.live) alts.indices.firstOrNull { it != curI && it !in tried }
+        val ni: Int? = if (cur.live) alts.indices.firstOrNull { it != curI && it !in tried }
             else QualityLogic.fallback(alts.map { it.quality }, curI, tried, sameFirst)
-            ?: return false
+        if (ni == null) return false
         // 4K had to give way because of stutter/decoder: counts for the learned device limit (a dead link does not)
         if (!sameFirst && QualityLogic.rank(alts[curI].quality) >= 4 && QualityLogic.rank(alts[ni].quality) < 4) PlaybackPrefs.note4kTrouble(ctx)
         val at = player.currentPosition.coerceAtLeast(0L)
@@ -709,7 +709,7 @@ fun PlayerScreen(req: PlayReq, zapList: List<Item>, liveAll: List<Item>, seriesI
                 // and keep playing (picture and position stay). Never discard the whole source just because the audio fails.
                 if (decoder && audioFallback()) return
                 val liveNow = cur.live && cur.archive == null
-                if (retries < 2 && !isPermanentHttp(status) && !decoder) {
+                if (retries < (if (liveNow) 2 else 3) && !isPermanentHttp(status) && !decoder) {
                     retries++
                     msg = if (liveNow) "Verbindung unterbrochen – neuer Versuch ($retries)" else "Verbindung unterbrochen – neuer Versuch ($retries/3)"
                     // Live: keep trying with a growing pause (at most 15 s), and back to the live picture
