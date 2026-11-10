@@ -143,4 +143,13 @@ Setzt die Darstellung und Wiedergabeoptionen zurück. Deine Favoriten und der zu
 Uhrzeit jetzt: {0}¦Current time: {0}
 Version {0}¦Version {0}
 View¦Display
+Quelle {0}¦Source {0}
+Wiedergabe: {0}¦Playback: {0}
+Staffel {0}¦Season {0}
+Folge {0}¦Episode {0}
+Vorherige Folge: Staffel {0}, Folge {1}¦Previous episode: Season {0}, episode {1}
+Nächste Folge: Staffel {0}, Folge {1}¦Next episode: Season {0}, episode {1}
+Abspann¦Credits
+Fit¦Fit
+Beim Markieren einer Auswahl zeigt die Vorschau sofort die Wirkung, OK übernimmt sie.¦When highlighting an option, the preview shows the result immediately; OK applies it.
 """
