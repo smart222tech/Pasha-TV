@@ -164,4 +164,78 @@ Letzter Kanal¦Последний канал
 Extern öffnen¦Открыть во внешнем плеере
 Zu Favoriten hinzugefügt¦Добавлено в избранное
 Aus Favoriten entfernt¦Удалено из избранного
+4K does not suit this device – playing FHD¦4K не подходит этому устройству — включено Full HD
+Tonspur „¦Аудиодорожка «
+Diese Tonspur kann hier nicht abgespielt werden – andere Spur gewählt¦Эту аудиодорожку нельзя воспроизвести — выбрана другая дорожка
+Wiedergabe: ¦Воспроизведение: 
+Next episode¦Следующая серия
+Staffel ¦Сезон 
+ · Folge ¦ · серия 
+Archiv¦Архив
+Folge ¦Серия 
+Vorherige Sendung: ¦Предыдущая передача: 
+Vorherige Sendung¦Предыдущая передача
+Vorherige Folge: Staffel ¦Предыдущая серия: сезон 
+Vorherige Folge¦Предыдущая серия
+Nächste Sendung: ¦Следующая передача: 
+Nächste Sendung: Live¦Следующая передача: эфир
+Nächste Folge: Staffel ¦Следующая серия: сезон 
+Nächste Folge¦Следующая серия
+Archiv: verpasste Sendungen¦Архив: пропущенные передачи
+Folgen¦Серии
+Links = zurück¦Влево — назад
+Aus¦Выкл.
+Anzeigen¦Показывать
+Ort¦Положение
+Schrift: Deckkraft¦Прозрачность текста
+Hintergrund: Deckkraft¦Прозрачность фона
+Abspann überspringen¦Пропустить титры
+Schnell ¦Быстро 
+Skip intro¦Пропустить заставку
+Kein Programm für diesen Sender¦Для этого канала нет программы передач
+Danach¦Далее
+OK = ansehen  ·  halten = Favorit  ·  Links = Kategorien¦OK — смотреть · удерживать — в избранное · влево — категории
+Links schließt das Menü  ·  Rechts wechselt zu den Untertiteln¦Влево — закрыть меню · вправо — перейти к субтитрам
+Audio¦Аудио
+Keine Auswahl verfügbar¦Нет доступных вариантов
+Dieser Stream enthält keine Untertitel.¦В этом потоке нет субтитров.
+Aussehen der Untertitel¦Внешний вид субтитров
+Rechts / Vorspulen = 50 weiter · Zurückspulen = zurück · Links schließt¦Вправо / перемотка вперёд — +50 · назад — −50 · влево — закрыть
+läuft¦воспроизводится
+Start¦Запуск
+PASHA TV Lite startet automatisch mit dem zuletzt angesehenen Sender. Beim ersten Start wird der erste verfügbare Sender geöffnet.¦PASHA TV Lite автоматически запускает последний просмотренный канал. При первом запуске открывается первый доступный канал.
+Gerätestart¦Запуск устройства
+Beim Einschalten des Geräts öffnen¦Открывать при включении устройства
+Bedienung¦Управление
+Beenden bestätigen¦Подтверждать выход
+Auf der TV-Startseite muss Zurück zweimal gedrückt werden, damit die App nicht versehentlich geschlossen wird.¦На главном экране ТВ нужно дважды нажать «Назад», чтобы случайно не закрыть приложение.
+Auf dem Handy im Querformat¦На телефоне в альбомной ориентации
+Zwischenspeicher¦Кэш
+Leeren¦Очистить
+Verlauf¦История
+Suchverlauf löschen¦Очистить историю поиска
+Zuletzt geschaut löschen¦Очистить недавно просмотренное
+Weiterschauen löschen¦Очистить список продолжения просмотра
+Meine Liste und Favoriten bleiben immer erhalten.¦Мой список и избранное сохраняются.
+Uhrzeit: Ort¦Положение часов
+Uhrzeit: Größe¦Размер часов
+Uhrzeit: Hintergrund¦Фон часов
+Dunkler Kasten hinter der Uhr. Aus = nur die Zahlen.¦Тёмная подложка под часами. Выкл. — только цифры.
+Uhrzeit: Hintergrund-Deckkraft¦Прозрачность фона часов
+Fertige Designs¦Готовые темы
+Farbthema¦Цветовая тема
+Eigene Farben¦Свои цвета
+Farbe 1 · Flächen¦Цвет 1 · поверхности
+Farbe 2 · Hervorhebung¦Цвет 2 · выделение
+Farbe 2 · automatisch¦Цвет 2 · автоматически
+Übernehmen¦Применить
+Ungültig¦Недопустимо
+Animationen¦Анимации
+Anzeigegröße¦Размер интерфейса
+Playlist neu laden¦Обновить плейлист
+Bericht kopieren¦Скопировать отчёт
+Automatische Genres¦Автоматические жанры
+Filme¦Фильмы
+Serien¦Сериалы
+Live-TV¦ТВ
 """.trimIndent()
