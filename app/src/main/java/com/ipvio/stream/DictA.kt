@@ -140,4 +140,6 @@ Die Oberfläche ist für TV-Bildschirme optimiert. Im Player bleiben die Touch-S
 Berechtigung fehlt noch. Bitte „Einstellung öffnen“ wählen und PASHA TV Lite erlauben.¦Permission is still missing. Select “Open settings” and allow PASHA TV Lite.
 PASHA TV Lite ist ein Player. Die Verfügbarkeit einzelner Sender hängt von den jeweiligen Stream-Quellen ab. Nutze nur Quellen, für die du eine Berechtigung hast.¦PASHA TV Lite is a player. Channel availability depends on the respective stream sources. Use only sources you are authorized to access.
 Setzt die Darstellung und Wiedergabeoptionen zurück. Deine Favoriten und der zuletzt angesehene Sender bleiben erhalten.¦Resets display and playback options. Your favorites and last watched channel are kept.
+Uhrzeit jetzt: {0}¦Current time: {0}
+Version {0}¦Version {0}
 """
