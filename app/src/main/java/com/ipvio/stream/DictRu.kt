@@ -81,4 +81,87 @@ Quelle gestört¦Источник не работает
 Quelle antwortet nicht¦Источник не отвечает
 Pause¦Пауза
 Quelle¦Источник
+Sprache & Region¦Язык и регион
+Sprache, Uhrzeit, Zeitzone¦Язык, время, часовой пояс
+Sender, Wiedergabe und Darstellung¦Каналы, воспроизведение и изображение
+Alle Einstellungen zurücksetzen¦Сбросить все настройки
+Wiedergabe¦Воспроизведение
+Sprung links/rechts¦Переход влево/вправо
+Standard-Bildformat¦Формат изображения по умолчанию
+Steuerleiste ausblenden nach¦Скрывать панель управления через
+Stream-Info am Start¦Информация о потоке при запуске
+Endzeit anzeigen¦Показывать время окончания
+Intro und nächste Folge¦Интро и следующая серия
+Intro überspringen anbieten¦Предлагать пропустить заставку
+Intro automatisch überspringen¦Автоматически пропускать заставку
+Nächste Folge automatisch¦Автоматически запускать следующую серию
+Abspann automatisch überspringen¦Автоматически пропускать титры
+Uhr im Bild¦Часы на экране
+Vorschau¦Предпросмотр
+Uhrzeit im Bild¦Время на экране
+Zeigt die aktuelle Uhrzeit beim Abspielen in einer Ecke (nicht, solange die Steuerleiste offen ist).¦Показывает текущее время в углу во время просмотра (кроме режима открытого управления).
+Oben rechts¦Сверху справа
+Oben links¦Сверху слева
+Unten rechts¦Снизу справа
+Unten links¦Снизу слева
+Klein¦Маленький
+Mittel¦Средний
+Groß¦Большой
+Normal¦Обычный
+Sehr groß¦Очень большой
+Puffer (bei langsamem Internet)¦Буфер (при медленном интернете)
+Bildrate anpassen¦Подстраивать частоту кадров
+Bildschirm anpassen¦Настроить экран
+Bildschirmrand einstellen¦Настроить границы экрана
+Uhr anzeigen¦Показывать часы
+Schriftart¦Шрифт
+Schriftgröße¦Размер шрифта
+Design zurücksetzen¦Сбросить оформление
+Inhalte¦Содержимое
+Ladezustand¦Состояние загрузки
+Programm (EPG)¦Программа передач (EPG)
+Metadaten¦Метаданные
+Letzter Fehler¦Последняя ошибка
+Fehler seit Start¦Ошибки с момента запуска
+Bildschirm wach¦Не выключать экран
+Kein Kanal mit dieser Nummer¦Канала с таким номером нет
+Nicht im Archiv verfügbar¦Недоступно в архиве
+Format nicht abspielbar¦Формат не поддерживается
+Diese Sendung ist im Archiv des Anbieters nicht abrufbar.  Zurück = Live-Sender.¦Эта передача недоступна в архиве провайдера. Назад — к прямому каналу.
+Zurück mit der Zurück-Taste.¦Нажмите «Назад», чтобы вернуться.
+Ruckelt – Puffer wird beim nächsten Start größer¦Воспроизведение прерывается — при следующем запуске буфер будет увеличен
+Ruckelt¦Воспроизведение прерывается
+Stream beendet – verbinde neu …¦Поток завершился — переподключение …
+Verbindung wieder da – lade neu …¦Соединение восстановлено — загрузка …
+Aufnahme läuft weiter – dafür braucht dein Anbieter 2 gleichzeitige Verbindungen¦Запись продолжается — провайдеру нужны 2 одновременных подключения
+Das Portal hat keine Abspiel-Adresse geliefert. Später erneut versuchen.¦Портал не предоставил адрес воспроизведения. Попробуйте позже.
+Zu wenig freier Speicher für den Live-Puffer¦Недостаточно свободного места для буфера эфира
+Bildschirm kann nicht wach gehalten werden – der Bildschirmschoner kann starten.¦Не удалось отключить выключение экрана — может запуститься заставка.
+So sehen deine Untertitel aus¦Так выглядят субтитры
+Audio & Untertitel¦Звук и субтитры
+Links schließt das Menü¦Нажмите влево, чтобы закрыть меню
+Größe¦Размер
+Farbe¦Цвет
+Hintergrund¦Фон
+Rand¦Обводка
+OK = nächster Wert. Die Vorschau zeigt das Ergebnis.¦OK — следующее значение. Результат виден в предпросмотре.
+Videoqualität¦Качество видео
+Bildspur¦Видеодорожка
+Keine Auswahl verfügbar (feste Qualität).¦Нет доступных вариантов (фиксированное качество).
+Sprungweite¦Интервал перехода
+Gilt für Links/Rechts, Halten und die Zeitleiste.¦Для кнопок влево/вправо, удержания и временной шкалы.
+Zusatzbild¦Дополнительное изображение
+Anordnung¦Расположение
+Geteilt¦Разделённый экран
+Bild-in-Bild¦Картинка в картинке
+Ton von¦Звук из
+Hauptstream¦Основной поток
+Fenstergröße¦Размер окна
+Position¦Положение
+Streams tauschen¦Поменять потоки местами
+Technik-Info¦Техническая информация
+Letzter Kanal¦Последний канал
+Extern öffnen¦Открыть во внешнем плеере
+Zu Favoriten hinzugefügt¦Добавлено в избранное
+Aus Favoriten entfernt¦Удалено из избранного
 """.trimIndent()
