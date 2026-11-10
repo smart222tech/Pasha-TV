@@ -1371,7 +1371,7 @@ fun PlayerScreen(req: PlayReq, zapList: List<Item>, liveAll: List<Item>, seriesI
                                 PlayerIcon(PIcon.Channels, it)
                             }
                             PRoundButton(label = "Kategorien", onLabel = setLabel, onClick = { openCategories() }) {
-                                PlayerIcon(PIcon.Guide, it)
+                                AppIcon(AIcon.Grid, it, size = 26.dp)
                             }
                             PRoundButton(label = "Vorheriger Sender", enabled = zapSrc.size > 1, onLabel = setLabel, onClick = { zap(-1) }) {
                                 PlayerIcon(PIcon.PrevEp, it)
