@@ -110,4 +110,51 @@ Playlist-Zwischenspeicher¦Playlist cache¦Playlist önbelleği¦Priručna memor
 Schneller Start ohne Wartezeit¦Fast start without waiting¦Beklemeden hızlı başlangıç¦Brzi start bez čekanja¦Brzi start bez čekanja¦Brzi start bez čekanja¦Inicio rápido sin esperas¦Démarrage rapide sans attente¦Avvio rapido senza attese
 Bilder¦Images¦Görseller¦Slike¦Slike¦Slike¦Imágenes¦Images¦Immagini
 Zwischengespeicherte Cover und Hintergründe¦Cached covers and backgrounds¦Önbelleğe alınmış kapaklar ve arka planlar¦Spremljene naslovnice i pozadine¦Spremljene naslovnice i pozadine¦Sačuvane naslovnice i pozadine¦Carátulas y fondos en caché¦Jaquettes et arrière-plans en cache¦Copertine e sfondi in cache
+Vorheriger Sender¦Previous channel
+Nächster Sender¦Next channel
+Quelle¦Source
+Sender, Wiedergabe und Darstellung¦Channels, playback and display
+4K does not suit this device – playing FHD¦4K is not suitable for this device — playing FHD
+Tonspur „¦Audio track “
+Wiedergabe: ¦Playback: 
+Next episode¦Next episode
+Staffel ¦Season 
+ · Folge ¦ · Episode 
+Folge ¦Episode 
+Vorherige Sendung: ¦Previous programme: 
+Vorherige Folge: Staffel ¦Previous episode: Season 
+Nächste Sendung: ¦Next programme: 
+Nächste Folge: Staffel ¦Next episode: Season 
+Ort¦Position
+Schnell ¦Fast 
+Skip intro¦Skip intro
+Links schließt das Menü  ·  Rechts wechselt zu den Untertiteln¦Left closes the menu · Right switches to subtitles
+Rechts / Vorspulen = 50 weiter · Zurückspulen = zurück · Links schließt¦Right / fast-forward = 50 ahead · rewind = back · Left closes
+PASHA TV Lite startet automatisch mit dem zuletzt angesehenen Sender. Beim ersten Start wird der erste verfügbare Sender geöffnet.¦PASHA TV Lite automatically starts with the last watched channel. On first launch, the first available channel opens.
+Gerätestart¦Device startup
+Auf der TV-Startseite muss Zurück zweimal gedrückt werden, damit die App nicht versehentlich geschlossen wird.¦On the TV home screen, press Back twice to avoid closing the app accidentally.
+Live-TV¦Live TV
+Versucht PASHA TV Lite beim Start des Fernsehers oder der Box automatisch zu öffnen. Die Verfügbarkeit hängt von Android bzw. Fire OS ab.¦Tries to open PASHA TV Lite automatically when the TV or box starts. Availability depends on Android or Fire OS.
+Für den Autostart fehlt möglicherweise die Berechtigung „Über anderen Apps einblenden“. Fire OS kann diese Funktion einschränken.¦Auto-start may require the “Display over other apps” permission. Fire OS may restrict this feature.
+Die Oberfläche ist für TV-Bildschirme optimiert. Im Player bleiben die Touch-Steuerungen verfügbar.¦The interface is optimized for TV screens. Touch controls remain available in the player.
+Berechtigung fehlt noch. Bitte „Einstellung öffnen“ wählen und PASHA TV Lite erlauben.¦Permission is still missing. Select “Open settings” and allow PASHA TV Lite.
+PASHA TV Lite ist ein Player. Die Verfügbarkeit einzelner Sender hängt von den jeweiligen Stream-Quellen ab. Nutze nur Quellen, für die du eine Berechtigung hast.¦PASHA TV Lite is a player. Channel availability depends on the respective stream sources. Use only sources you are authorized to access.
+Setzt die Darstellung und Wiedergabeoptionen zurück. Deine Favoriten und der zuletzt angesehene Sender bleiben erhalten.¦Resets display and playback options. Your favorites and last watched channel are kept.
+Uhrzeit jetzt: {0}¦Current time: {0}
+Version {0}¦Version {0}
+View¦Display
+Quelle {0}¦Source {0}
+Wiedergabe: {0}¦Playback: {0}
+Staffel {0}¦Season {0}
+Folge {0}¦Episode {0}
+Vorherige Folge: Staffel {0}, Folge {1}¦Previous episode: Season {0}, episode {1}
+Nächste Folge: Staffel {0}, Folge {1}¦Next episode: Season {0}, episode {1}
+Abspann¦Credits
+Fit¦Fit
+Beim Markieren einer Auswahl zeigt die Vorschau sofort die Wirkung, OK übernimmt sie.¦When highlighting an option, the preview shows the result immediately; OK applies it.
+Continue watching¦Continue watching
+Play again¦Play again
+Previous/Next show¦Previous/next programme
+Next¦Next
+Oberfläche aktuell ×{0} (Bildschirm {1} dp breit).¦Current interface scale ×{0} (screen {1} dp wide).
 """

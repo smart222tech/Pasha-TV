@@ -5,20 +5,22 @@ import org.junit.Before
 import org.junit.Test
 
 class I18nCoreTest {
-    @Before fun setUp() { I18nCore.load(DictA, DictB, DictC, DictD, DictE, DictF, DictG, DictH, DictI) }
+    @Before fun setUp() { I18nCore.load(DictA, DictB, DictC, DictD, DictE, DictF, DictG, DictH, DictI, DictJ)
+        I18nCore.loadColumn(I18nCore.CODES.indexOf("ru"), DictRu)
+        I18nCore.loadColumn(I18nCore.CODES.indexOf("uk"), DictUk) }
 
-    private val EN = 1; private val TR = 2; private val BS = 3; private val HR = 4; private val SR = 5; private val DE = 0
+    private val EN = 1; private val RU = 2; private val UK = 3; private val DE = 0
 
     @Test fun exact() {
         assertEquals("Parental controls", I18nCore.translate("Jugendschutz", EN))
-        assertEquals("Ebeveyn kontrolü", I18nCore.translate("Jugendschutz", TR))
+        assertEquals("Родительский контроль", I18nCore.translate("Jugendschutz", RU))
+        assertEquals("Батьківський контроль", I18nCore.translate("Jugendschutz", UK))
     }
     @Test fun germanIsIdentity() {
         assertEquals("Jugendschutz", I18nCore.translate("Jugendschutz", DE))
     }
-    @Test fun croatianAndSerbianFallBackToBosnian() {
-        assertEquals(I18nCore.translate("Jugendschutz", BS), I18nCore.translate("Jugendschutz", HR))
-        assertEquals(I18nCore.translate("Jugendschutz", BS), I18nCore.translate("Jugendschutz", SR))
+    @Test fun onlyFourAppLanguagesAreAvailable() {
+        assertEquals(listOf("de", "en", "ru", "uk"), I18nCore.CODES)
     }
     @Test fun surroundingSpacesAreKept() {
         assertEquals("  Reload active playlist ", I18nCore.translate("  Aktive Playlist neu laden ", EN))
@@ -46,7 +48,8 @@ class I18nCoreTest {
         assertEquals("Playback speed", I18nCore.translate("Wiedergabe-Tempo", EN))
     }
     @Test fun systemLanguage() {
-        assertEquals(TR, I18nCore.indexForSystem("tr"))
-        assertEquals(EN, I18nCore.indexForSystem("ja"))
+        assertEquals(RU, I18nCore.indexForSystem("ru"))
+        assertEquals(UK, I18nCore.indexForSystem("uk"))
+        assertEquals(DE, I18nCore.indexForSystem("fr"))
     }
 }

@@ -6,8 +6,8 @@ package com.ipvio.stream
  * Placeholders: {0} any text, {#0} number. A line break is written as \n.
  */
 object I18nCore {
-    val CODES = listOf("de", "en", "tr", "bs", "hr", "sr", "es", "fr", "it", "nl")
-    val NATIVE = listOf("Deutsch", "English", "Türkçe", "Bosanski", "Hrvatski", "Srpski", "Español", "Français", "Italiano", "Nederlands")
+    val CODES = listOf("de", "en", "ru", "uk")
+    val NATIVE = listOf("Deutsch", "English", "Русский", "Українська")
 
     private class Pat(val src: String, val re: Regex, val tr: Array<String>, val numeric: BooleanArray)
 
@@ -28,15 +28,8 @@ object I18nCore {
             if (p.size < 2) continue
             val de = p[0]
             val en = p.getOrElse(1) { "" }.ifEmpty { de }
-            val bs = p.getOrElse(3) { "" }.ifEmpty { en }
-            val row = Array(CODES.size) { i ->
-                when (i) {
-                    0 -> de
-                    1 -> en
-                    4, 5 -> p.getOrElse(i) { "" }.ifEmpty { bs }
-                    else -> p.getOrElse(i) { "" }.ifEmpty { en }
-                }
-            }
+            // Legacy dictionaries keep their old columns; Russian and Ukrainian are loaded separately.
+            val row = Array(CODES.size) { i -> if (i == 0) de else en }
             if (PH.containsMatchIn(de)) {
                 val sb = StringBuilder("^")
                 var last = 0
@@ -126,9 +119,9 @@ object I18nCore {
         return null
     }
 
-    /** Language index for a device language code (e.g. "tr"); unknown → English. */
+    /** Language index for a supported device language; unsupported devices default to German. */
     fun indexForSystem(code: String): Int {
         val i = CODES.indexOf(code.lowercase())
-        return if (i >= 0) i else 1
+        return if (i >= 0) i else 0
     }
 }

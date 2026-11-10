@@ -38,8 +38,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         // Load settings early so colors and size are right in the very first frame.
         Profiles.init(this)
-        val pick = Profiles.needsPicker(this)
-        if (!pick) AppSettings.init(this)
+        // PASHA TV Lite is a single-viewer TV app; never show the legacy profile picker.
+        Profiles.setAsk(this, false)
+        val pick = false
+        AppSettings.init(this)
         General.init(this)
         Boomer.init(this)
         HomeLayout.init(this); BoomerLayout.init(this)
@@ -152,10 +154,15 @@ fun App(pick: Boolean = false) {
     ) {
         val c = LocalContext.current
         var picked by remember { mutableStateOf(!pick) }
+        var languageChosen by remember { mutableStateOf(General.languageChosen) }
         if (!picked) ProfilePicker { id -> Profiles.select(c, id); AppSettings.init(c); Parental.init(c); LangFilter.init(c); Boomer.init(c); HomeLayout.init(c); BoomerLayout.init(c); picked = true }
-        else {
-            LaunchedEffect(Unit) { delay(10_000); runCatching { SportAlerts.run(c.applicationContext) } }   // after the start: the playlist and the home screen come first
-            Box(Modifier.fillMaxSize()) { AppContent(); SportAlertHost() }
+        else if (!languageChosen) {
+            FirstLaunchLanguageScreen { code ->
+                General.setLang(c, code)
+                languageChosen = true
+            }
+        } else {
+            Box(Modifier.fillMaxSize()) { AppContent() }
         }
     }
 }
@@ -175,12 +182,15 @@ private val SE_RE = Regex("""S(\d+)E(\d+)""")
 private fun AppContent() {
     val ctx = LocalContext.current
     remember {
-        AppSettings.init(ctx); WatchStore.init(ctx); History.init(ctx); Library.init(ctx); QualityStore.init(ctx)
+        AppSettings.init(ctx)
+        // PASHA TV keeps the original IPVIO navigation, animation and player, but exposes only three areas.
+        AppSettings.menuOrder.clear(); AppSettings.menuOrder.addAll(listOf(3, MenuLogic.FAVS, MenuLogic.SETTINGS))
+        AppSettings.menuHidden.clear()
+        WatchStore.init(ctx); History.init(ctx); Library.init(ctx); QualityStore.init(ctx)
         PlaybackPrefs.init(ctx); DeadLinks.init(ctx); ChannelLists.init(ctx); Reminders.init(ctx); Reminders.schedule(ctx); 0
     }
-    // Interrupted in the middle of adding last time (crash, power loss): the add screen automatically continues loading
-    val resumeAdd = remember { PlaylistStore.pending(ctx)?.autoResume == true }
-    var adding by remember { mutableStateOf(PlaylistStore.savedUrl(ctx) == null || resumeAdd) }
+    // PASHA TV ships with its own channel catalog; playlist import is not part of this app.
+    var adding by remember { mutableStateOf(false) }
     // Top detail page (Item or PersonRef) plus back stack, so Back retraces Movie → Person → Movie
     var top by remember { mutableStateOf<Any?>(null) }
     val trail = remember { mutableStateListOf<Any>() }
@@ -191,7 +201,7 @@ private fun AppContent() {
     var browse by remember { mutableStateOf<BrowseState?>(null) }
     var cats by remember { mutableStateOf<CatReq?>(null) }
     var playing by remember { mutableStateOf<PlayReq?>(null) }
-    var tab by remember { mutableStateOf(SettingsLogic.resolveStartTab(General.startTab, AppSettings.menuOrder.toList(), AppSettings.menuHidden.toList())) }
+    var tab by remember { mutableStateOf(3) }
     val gridState = remember(browse) { LazyGridState() }
     val states = listOf(
         rememberLazyListState(), rememberLazyListState(), rememberLazyListState(),
@@ -207,31 +217,19 @@ private fun AppContent() {
 
     LaunchedEffect(Unit) {
         withContext(Dispatchers.IO) { General.cleanupLegacy(ctx) }
-        if (resumeAdd) return@LaunchedEffect
-        PlaylistStore.savedUrl(ctx)?.let { u ->
-            val skip = !SettingsLogic.refreshDue(General.plan(), General.lastRefresh, System.currentTimeMillis(), General.zone())
-            val ok = PlaylistStore.load(ctx, u, false, skip)
-            if (ok && !skip) General.markRefreshed(ctx)
-        }
+        PlaylistStore.installBuiltIn(ctx, PashaCatalog.channels)
+        // PASHA TV Lite always resumes the last watched channel on every app launch.
+        General.setResumeLive(ctx, true)
     }
 
     // Back in the app after the Home key: to the home screen (a running playback and adding stay as they are)
     LaunchedEffect(AppNav.homeSignal) {
         if (AppNav.homeSignal > 0 && playing == null && !adding) {
-            val changed = top != null || browse != null || cats != null || tab != 0
+            val changed = top != null || browse != null || cats != null || tab != 3
             top = null; trail.clear(); browse = null; cats = null
-            if (changed) AppNav.focusTab = 0
-            if (tab != 0) { tab = 0; CatMemory.reset() }
+            if (changed) AppNav.focusTab = 3
+            if (tab != 3) { tab = 3; CatMemory.reset() }
         }
-    }
-
-    // Left the add screen without anything loaded (e.g. resuming cancelled): load the saved playlist
-    var wasAdding by remember { mutableStateOf(adding) }
-    LaunchedEffect(adding) {
-        if (wasAdding && !adding && PlaylistStore.channels.isEmpty() && !PlaylistStore.loading) {
-            PlaylistStore.savedUrl(ctx)?.let { PlaylistStore.load(ctx, it, false, true) }
-        }
-        wasAdding = adding
     }
 
     val all = PlaylistStore.channels
@@ -243,6 +241,7 @@ private fun AppContent() {
 
     fun start(item: Item, title: String, url: String, startMs: Long = 0L) {
         History.add(ctx, item.id)
+        if (item.kind == Kind.LIVE && item.id.startsWith("pasha:")) PashaLastChannel.save(ctx, item.id)
         val sm = SE_RE.find(title)
         val season = sm?.groupValues?.get(1)?.toIntOrNull() ?: 0
         val ep = sm?.groupValues?.get(2)?.toIntOrNull() ?: 0
@@ -366,10 +365,16 @@ private fun AppContent() {
     LaunchedEffect(all.isNotEmpty()) {
         if (all.isNotEmpty() && !General.startupHandled) {
             General.startupHandled = true
-            val lastId = History.ids.firstOrNull()
-            val last = if (lastId == null || playing != null) null else all.firstOrNull { it.id == lastId }
-            if (last != null && last.kind == Kind.LIVE && General.resumeLive) start(last, last.title, last.url)
-            else if (last != null && last.kind != Kind.LIVE && General.resumeVod) {
+            val lastId = PashaLastChannel.get(ctx)
+                ?: History.ids.firstOrNull { id -> liveAll.any { it.id == id } }
+            val last = if (playing != null) null else
+                all.firstOrNull { it.id == lastId && it.kind == Kind.LIVE }
+                    ?: liveAll.firstOrNull()
+            if (last != null && General.resumeLive) {
+                ZapContext.list = liveAll
+                ZapContext.key = "ALL"
+                start(last, last.title, last.url)
+            } else if (last != null && last.kind != Kind.LIVE && General.resumeVod) {
                 // only with a remembered position (fully watched movies do not start from the beginning; for series possibly the next episode)
                 val e = WatchStore.entries.firstOrNull { it.itemId == last.id }
                 if (e != null) {
@@ -478,7 +483,7 @@ private fun AppContent() {
                 },
                 onBrowse = { browse = BrowseState(it) },
                 onCategories = { cats = it },
-                onAdd = { adding = true }
+                onAdd = { /* playlist import is intentionally disabled in PASHA TV */ }
             ) }
         }
         if (RemoteUi.show) RemoteOverlay(Modifier.align(Alignment.Center))

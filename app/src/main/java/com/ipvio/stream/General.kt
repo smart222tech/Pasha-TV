@@ -33,6 +33,8 @@ object General {
     var lastRefresh by mutableStateOf(0L)
     /** Language: "" = device, otherwise code from Lang.CODES */
     var lang by mutableStateOf("")
+    /** First-run language has been explicitly selected. */
+    var languageChosen by mutableStateOf(false)
     /** Time zone: "" = system time of the device */
     var tzId by mutableStateOf("")
     /** Zeitformat: 0 = System, 1 = 24 Stunden, 2 = 12 Stunden */
@@ -124,6 +126,7 @@ object General {
         refreshDow = p.getInt("refresh_dow", java.util.Calendar.MONDAY).coerceIn(1, 7)
         lastRefresh = p.getLong("last_refresh", 0L)
         lang = p.getString("lang", "") ?: ""
+        languageChosen = p.getBoolean("language_chosen", false)
         tzId = p.getString("tz_id", "") ?: ""
         timeFmt = p.getInt("time_fmt", 0).coerceIn(0, 2)
         sys24 = android.text.format.DateFormat.is24HourFormat(c)
@@ -160,7 +163,7 @@ object General {
             .putInt("refresh_minute", refreshMinute).putInt("refresh_dow", refreshDow).apply()
         Updater.apply(c)
     }
-    fun setLang(c: Context, v: String) { lang = v; prefs(c).edit().putString("lang", v).apply(); PlayerLocale.locale = Lang.locale() }
+    fun setLang(c: Context, v: String) { lang = v; languageChosen = true; prefs(c).edit().putString("lang", v).putBoolean("language_chosen", true).apply(); PlayerLocale.locale = Lang.locale() }
     fun setTz(c: Context, id: String) { tzId = id; prefs(c).edit().putString("tz_id", id).apply() }
     fun setTimeFmt(c: Context, v: Int) { timeFmt = v.coerceIn(0, 2); prefs(c).edit().putInt("time_fmt", timeFmt).apply() }
     fun setFont(c: Context, v: Int) { fontIdx = v.coerceIn(0, FONTS.lastIndex); prefs(c).edit().putInt("font2", fontIdx).apply() }
