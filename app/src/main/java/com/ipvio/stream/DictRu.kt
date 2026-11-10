@@ -330,4 +330,5 @@ Continue watching¦Продолжить просмотр
 Play again¦Смотреть снова
 Previous/Next show¦Предыдущая/следующая передача
 Next¦Далее
+Oberfläche aktuell ×{0} (Bildschirm {1} dp breit).¦Текущий масштаб интерфейса ×{0} (ширина экрана {1} dp).
 """.trimIndent()
