@@ -110,4 +110,6 @@ Playlist-Zwischenspeicher¦Playlist cache¦Playlist önbelleği¦Priručna memor
 Schneller Start ohne Wartezeit¦Fast start without waiting¦Beklemeden hızlı başlangıç¦Brzi start bez čekanja¦Brzi start bez čekanja¦Brzi start bez čekanja¦Inicio rápido sin esperas¦Démarrage rapide sans attente¦Avvio rapido senza attese
 Bilder¦Images¦Görseller¦Slike¦Slike¦Slike¦Imágenes¦Images¦Immagini
 Zwischengespeicherte Cover und Hintergründe¦Cached covers and backgrounds¦Önbelleğe alınmış kapaklar ve arka planlar¦Spremljene naslovnice i pozadine¦Spremljene naslovnice i pozadine¦Sačuvane naslovnice i pozadine¦Carátulas y fondos en caché¦Jaquettes et arrière-plans en cache¦Copertine e sfondi in cache
+Vorheriger Sender¦Previous channel
+Nächster Sender¦Next channel
 """
