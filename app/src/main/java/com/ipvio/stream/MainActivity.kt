@@ -154,8 +154,14 @@ fun App(pick: Boolean = false) {
     ) {
         val c = LocalContext.current
         var picked by remember { mutableStateOf(!pick) }
+        var languageChosen by remember { mutableStateOf(General.languageChosen) }
         if (!picked) ProfilePicker { id -> Profiles.select(c, id); AppSettings.init(c); Parental.init(c); LangFilter.init(c); Boomer.init(c); HomeLayout.init(c); BoomerLayout.init(c); picked = true }
-        else {
+        else if (!languageChosen) {
+            FirstLaunchLanguageScreen { code ->
+                General.setLang(c, code)
+                languageChosen = true
+            }
+        } else {
             Box(Modifier.fillMaxSize()) { AppContent() }
         }
     }
