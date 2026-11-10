@@ -44,7 +44,7 @@ object PashaCatalog {
     fun variantsFor(channelId: String): List<Variant> {
         val primary = channels.firstOrNull { it.id == channelId }?.url ?: return emptyList()
         return (listOf(primary) + backupSources[channelId].orEmpty()).distinct().mapIndexed { index, url ->
-            Variant(url, "Источник ${index + 1}", "SD", "ru")
+            Variant(url, "Quelle ${index + 1}", "SD", "ru")
         }
     }
 }
