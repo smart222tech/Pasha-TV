@@ -273,4 +273,8 @@ Sender als Favorit: auf dem Sender OK gedrückt halten > „Zu Favoriten“. Kat
 PASHA TV Lite ist ein Player. Die Verfügbarkeit einzelner Sender hängt von den jeweiligen Stream-Quellen ab. Nutze nur Quellen, für die du eine Berechtigung hast.¦PASHA TV Lite — это плеер. Доступность каналов зависит от источников трансляции. Используйте только источники, к которым у вас есть разрешённый доступ.
 Systemeinstellungen der App¦Системные настройки приложения
 Setzt die Darstellung und Wiedergabeoptionen zurück. Deine Favoriten und der zuletzt angesehene Sender bleiben erhalten.¦Сбрасывает настройки изображения и воспроизведения. Избранное и последний просмотренный канал сохраняются.
+Systemzeit (Gerät: {0})¦Системное время (устройство: {0})
+Uhrzeit jetzt: {0}¦Текущее время: {0}
+Version {0}¦Версия {0}
+Die Uhr folgt der Zeitzone und dem 12/24-Stunden-Format aus den Einstellungen. Im Player geht es auch über Einstellungen > Uhrzeit.¦Часы используют часовой пояс и 12/24-часовой формат из настроек. В плеере: Настройки > Часы.
 """.trimIndent()
