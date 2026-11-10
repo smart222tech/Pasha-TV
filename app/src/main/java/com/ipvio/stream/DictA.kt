@@ -114,4 +114,24 @@ Vorheriger Sender¦Previous channel
 Nächster Sender¦Next channel
 Quelle¦Source
 Sender, Wiedergabe und Darstellung¦Channels, playback and display
+4K does not suit this device – playing FHD¦4K is not suitable for this device — playing FHD
+Tonspur „¦Audio track “
+Wiedergabe: ¦Playback: 
+Next episode¦Next episode
+Staffel ¦Season 
+ · Folge ¦ · Episode 
+Folge ¦Episode 
+Vorherige Sendung: ¦Previous programme: 
+Vorherige Folge: Staffel ¦Previous episode: Season 
+Nächste Sendung: ¦Next programme: 
+Nächste Folge: Staffel ¦Next episode: Season 
+Ort¦Position
+Schnell ¦Fast 
+Skip intro¦Skip intro
+Links schließt das Menü  ·  Rechts wechselt zu den Untertiteln¦Left closes the menu · Right switches to subtitles
+Rechts / Vorspulen = 50 weiter · Zurückspulen = zurück · Links schließt¦Right / fast-forward = 50 ahead · rewind = back · Left closes
+PASHA TV Lite startet automatisch mit dem zuletzt angesehenen Sender. Beim ersten Start wird der erste verfügbare Sender geöffnet.¦PASHA TV Lite automatically starts with the last watched channel. On first launch, the first available channel opens.
+Gerätestart¦Device startup
+Auf der TV-Startseite muss Zurück zweimal gedrückt werden, damit die App nicht versehentlich geschlossen wird.¦On the TV home screen, press Back twice to avoid closing the app accidentally.
+Live-TV¦Live TV
 """
