@@ -36,6 +36,17 @@ object PashaCatalog {
             "https://vod.tuva.ru/friday/tracks-v1a1/mono.ts.m3u8",
             null, "Россия", lang = "ru")
     )
+
+    // Backup URLs are added only after they have been verified and authorized.
+    // The player tries these in order when a live stream fails or remains in buffering.
+    private val backupSources: Map<String, List<String>> = emptyMap()
+
+    fun variantsFor(channelId: String): List<Variant> {
+        val primary = channels.firstOrNull { it.id == channelId }?.url ?: return emptyList()
+        return (listOf(primary) + backupSources[channelId].orEmpty()).distinct().mapIndexed { index, url ->
+            Variant(url, "Источник ${index + 1}", "SD", "ru")
+        }
+    }
 }
 
 
