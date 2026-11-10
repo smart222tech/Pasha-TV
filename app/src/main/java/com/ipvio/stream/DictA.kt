@@ -156,4 +156,5 @@ Continue watching¦Continue watching
 Play again¦Play again
 Previous/Next show¦Previous/next programme
 Next¦Next
+Oberfläche aktuell ×{0} (Bildschirm {1} dp breit).¦Current interface scale ×{0} (screen {1} dp wide).
 """
