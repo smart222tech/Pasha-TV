@@ -142,4 +142,5 @@ PASHA TV Lite ist ein Player. Die Verfügbarkeit einzelner Sender hängt von den
 Setzt die Darstellung und Wiedergabeoptionen zurück. Deine Favoriten und der zuletzt angesehene Sender bleiben erhalten.¦Resets display and playback options. Your favorites and last watched channel are kept.
 Uhrzeit jetzt: {0}¦Current time: {0}
 Version {0}¦Version {0}
+View¦Display
 """
