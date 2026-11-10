@@ -164,4 +164,78 @@ Letzter Kanal¦Останній канал
 Extern öffnen¦Відкрити у зовнішньому плеєрі
 Zu Favoriten hinzugefügt¦Додано до обраного
 Aus Favoriten entfernt¦Видалено з обраного
+4K does not suit this device – playing FHD¦4K не підходить цьому пристрою — увімкнено Full HD
+Tonspur „¦Аудіодоріжка «
+Diese Tonspur kann hier nicht abgespielt werden – andere Spur gewählt¦Цю аудіодоріжку неможливо відтворити — вибрано іншу доріжку
+Wiedergabe: ¦Відтворення: 
+Next episode¦Наступна серія
+Staffel ¦Сезон 
+ · Folge ¦ · серія 
+Archiv¦Архів
+Folge ¦Серія 
+Vorherige Sendung: ¦Попередня передача: 
+Vorherige Sendung¦Попередня передача
+Vorherige Folge: Staffel ¦Попередня серія: сезон 
+Vorherige Folge¦Попередня серія
+Nächste Sendung: ¦Наступна передача: 
+Nächste Sendung: Live¦Наступна передача: ефір
+Nächste Folge: Staffel ¦Наступна серія: сезон 
+Nächste Folge¦Наступна серія
+Archiv: verpasste Sendungen¦Архів: пропущені передачі
+Folgen¦Серії
+Links = zurück¦Ліворуч — назад
+Aus¦Вимк.
+Anzeigen¦Показувати
+Ort¦Розташування
+Schrift: Deckkraft¦Прозорість тексту
+Hintergrund: Deckkraft¦Прозорість тла
+Abspann überspringen¦Пропустити титри
+Schnell ¦Швидко 
+Skip intro¦Пропустити заставку
+Kein Programm für diesen Sender¦Для цього каналу немає телепрограми
+Danach¦Далі
+OK = ansehen  ·  halten = Favorit  ·  Links = Kategorien¦OK — дивитися · утримувати — в обране · ліворуч — категорії
+Links schließt das Menü  ·  Rechts wechselt zu den Untertiteln¦Ліворуч — закрити меню · праворуч — перейти до субтитрів
+Audio¦Аудіо
+Keine Auswahl verfügbar¦Немає доступних варіантів
+Dieser Stream enthält keine Untertitel.¦У цьому потоці немає субтитрів.
+Aussehen der Untertitel¦Вигляд субтитрів
+Rechts / Vorspulen = 50 weiter · Zurückspulen = zurück · Links schließt¦Праворуч / перемотування вперед — +50 · назад — −50 · ліворуч — закрити
+läuft¦відтворюється
+Start¦Запуск
+PASHA TV Lite startet automatisch mit dem zuletzt angesehenen Sender. Beim ersten Start wird der erste verfügbare Sender geöffnet.¦PASHA TV Lite автоматично запускає останній переглянутий канал. Під час першого запуску відкривається перший доступний канал.
+Gerätestart¦Запуск пристрою
+Beim Einschalten des Geräts öffnen¦Відкривати під час увімкнення пристрою
+Bedienung¦Керування
+Beenden bestätigen¦Підтверджувати вихід
+Auf der TV-Startseite muss Zurück zweimal gedrückt werden, damit die App nicht versehentlich geschlossen wird.¦На головному екрані ТБ потрібно двічі натиснути «Назад», щоб випадково не закрити застосунок.
+Auf dem Handy im Querformat¦На телефоні в альбомній орієнтації
+Zwischenspeicher¦Кеш
+Leeren¦Очистити
+Verlauf¦Історія
+Suchverlauf löschen¦Очистити історію пошуку
+Zuletzt geschaut löschen¦Очистити нещодавно переглянуте
+Weiterschauen löschen¦Очистити список продовження перегляду
+Meine Liste und Favoriten bleiben immer erhalten.¦Мій список та обране зберігаються.
+Uhrzeit: Ort¦Розташування годинника
+Uhrzeit: Größe¦Розмір годинника
+Uhrzeit: Hintergrund¦Тло годинника
+Dunkler Kasten hinter der Uhr. Aus = nur die Zahlen.¦Темна підкладка під годинником. Вимк. — лише цифри.
+Uhrzeit: Hintergrund-Deckkraft¦Прозорість тла годинника
+Fertige Designs¦Готові теми
+Farbthema¦Колірна тема
+Eigene Farben¦Власні кольори
+Farbe 1 · Flächen¦Колір 1 · поверхні
+Farbe 2 · Hervorhebung¦Колір 2 · виділення
+Farbe 2 · automatisch¦Колір 2 · автоматично
+Übernehmen¦Застосувати
+Ungültig¦Некоректно
+Animationen¦Анімації
+Anzeigegröße¦Розмір інтерфейсу
+Playlist neu laden¦Оновити плейлист
+Bericht kopieren¦Скопіювати звіт
+Automatische Genres¦Автоматичні жанри
+Filme¦Фільми
+Serien¦Серіали
+Live-TV¦ТБ
 """.trimIndent()
