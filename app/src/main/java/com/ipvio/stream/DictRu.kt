@@ -69,4 +69,14 @@ Automatisch nach Updates suchen¦Автоматически проверять �
 Du hast die neueste Version.¦Установлена последняя версия.
 Dieses Gerät bietet die Einstellung nicht an.¦Это устройство не поддерживает эту настройку.
 Die App wird beim nächsten Start fortgesetzt.¦При следующем запуске приложение продолжит воспроизведение.
+Senderliste¦Список каналов
+Kategorien¦Категории
+Vorheriger Sender¦Предыдущий канал
+Nächster Sender¦Следующий канал
+OK halten = Kategorie als Favorit¦Удерживайте OK, чтобы добавить категорию в избранное
+Hoch und Runter wechseln den Sender¦Переключение каналов кнопками вверх и вниз
+Kein Programm verfügbar¦Программа передач недоступна
+Zurück zu Live¦Вернуться к прямому эфиру
+Quelle gestört¦Источник не работает
+Quelle antwortet nicht¦Источник не отвечает
 """.trimIndent()
