@@ -152,4 +152,8 @@ Nächste Folge: Staffel {0}, Folge {1}¦Next episode: Season {0}, episode {1}
 Abspann¦Credits
 Fit¦Fit
 Beim Markieren einer Auswahl zeigt die Vorschau sofort die Wirkung, OK übernimmt sie.¦When highlighting an option, the preview shows the result immediately; OK applies it.
+Continue watching¦Continue watching
+Play again¦Play again
+Previous/Next show¦Previous/next programme
+Next¦Next
 """
